@@ -6,7 +6,7 @@
 <title>Generator Konten — Bali Express (Highlight)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Poppins:wght@300;400&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
 <style>
   :root {
     --be-red: #C0181A;
@@ -253,9 +253,17 @@
     .preview-area { padding: 24px 16px; }
     #canvas { width: 300px; height: 375px; }
   }
+  .loading-screen { position:fixed; inset:0; z-index:9999; background:#FBFAF5; display:flex; align-items:center; justify-content:center; transition:opacity .5s ease, visibility .5s ease; }
+  .loading-screen.hide { opacity:0; visibility:hidden; pointer-events:none; }
+  .loading-text { font-family:'Playfair Display', Georgia, serif; font-weight:500; font-style:italic; font-size:34px; color:#3A3833; letter-spacing:.02em; opacity:0; transition:opacity .7s ease; text-align:center; padding:0 24px; }
+  .loading-text.show { opacity:1; }
+  @media(max-width:900px){.loading-text{font-size:26px}}
 </style>
 </head>
 <body>
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-text" id="loadingText"></div>
+</div>
 
 <div class="app">
   <div class="panel">
@@ -1338,6 +1346,48 @@ copyBtn.addEventListener('click', async () => {
   }, 1800);
 });
 
+// ===== LOADING SCREEN =====
+// Shows just ONE word per page load — not a cycling animation. Which word
+// comes up is tracked in localStorage as a "shuffle bag": every word is
+// guaranteed to appear once (in random order) before any word repeats,
+// then the bag reshuffles and the cycle starts again on a later reload.
+const LOADING_TEXTS = ['Semangat!', '화이팅!', '頑張って！', 'Forza!', 'Bon courage !', "Let's Go!"];
+const LOADING_BAG_KEY = 'be_loading_bag_v1';
+
+function shuffledCopy(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function nextLoadingTextPersisted() {
+  let bag = [];
+  try { bag = JSON.parse(localStorage.getItem(LOADING_BAG_KEY) || '[]'); } catch (e) { bag = []; }
+  if (!Array.isArray(bag) || bag.length === 0) bag = shuffledCopy(LOADING_TEXTS);
+
+  const word = bag.pop();
+  try { localStorage.setItem(LOADING_BAG_KEY, JSON.stringify(bag)); } catch (e) { /* storage unavailable, ignore */ }
+  return word;
+}
+
+const loadingScreen = document.getElementById('loadingScreen');
+const loadingTextEl = document.getElementById('loadingText');
+
+loadingTextEl.textContent = nextLoadingTextPersisted();
+requestAnimationFrame(() => loadingTextEl.classList.add('show'));
+
+const LOADING_MIN_MS = 1100; // keep the splash up at least this long so it never just flashes
+const loadingStartedAt = Date.now();
+function hideLoadingScreen() {
+  const wait = Math.max(0, LOADING_MIN_MS - (Date.now() - loadingStartedAt));
+  setTimeout(() => {
+    loadingScreen.classList.add('hide');
+  }, wait);
+}
+
 // ===== FONT LOADING =====
 function waitForFont() {
   if (document.fonts && document.fonts.load) {
@@ -1349,7 +1399,7 @@ function waitForFont() {
   return Promise.resolve();
 }
 
-waitForFont().then(render);
+waitForFont().then(() => { render(); hideLoadingScreen(); });
 render();
 
 </script>
