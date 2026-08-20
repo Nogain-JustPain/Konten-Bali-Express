@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bali Express — Generator Konten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,600;0,700;0,800;1,700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --be-red: #C0181A; --be-red-dark: #9E1214; --ink: #15141A; --ink-soft: #4A4854;
+    --paper: #FAFAF8; --line: #E5E2DC; --panel: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased; }
+
+  .masthead { border-bottom: 3px solid var(--ink); padding: 22px 40px; display: flex; align-items: center; gap: 16px; }
+  .back-link { display:inline-flex; align-items:center; gap:6px; font-family:'Inter',sans-serif; font-weight:700; font-size:12.5px; color:var(--ink-soft); text-decoration:none; transition:color .15s; }
+  .back-link:hover { color: var(--ink); }
+  .back-link svg { width:14px; height:14px; }
+  .masthead-title { font-family:'Inter', sans-serif; font-weight:800; font-size:16px; margin-left:auto; display:flex; align-items:center; gap:9px; }
+  .masthead-dot { width:9px; height:9px; border-radius:50%; background:var(--be-red); }
+
+  .intro { max-width: 1180px; margin: 0 auto; padding: 40px 40px 6px; }
+  .intro-eyebrow { font-family:'Inter',sans-serif; font-weight:700; font-size:12px; color:var(--be-red); text-transform:uppercase; letter-spacing:.1em; margin:0 0 10px; }
+  .intro h2 { font-family:'Inter',sans-serif; font-weight:800; font-size:clamp(24px,3.4vw,32px); line-height:1.2; letter-spacing:-.01em; margin:0 0 10px; }
+  .intro p { font-size:14.5px; line-height:1.6; color:var(--ink-soft); max-width:560px; margin:0; }
+
+  .grid-wrap { max-width: 1180px; margin: 0 auto; padding: 32px 40px 70px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 22px; }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .card.available:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(21,20,26,.1); border-color: var(--ink); }
+  .card.soon { cursor: default; }
+
+  .preview-wrapper { aspect-ratio: 4/3; position: relative; overflow: hidden; background: #EFEDE7; border-bottom: 1px solid var(--line); }
+  .preview-wrapper iframe { position:absolute; top:0; left:0; border:none; transform-origin: top left; pointer-events:none; background:#fff; }
+
+  .thumb-soon { aspect-ratio: 4/3; display:flex; align-items:center; justify-content:center; background: #EFEDE7;
+    background-image: repeating-linear-gradient(135deg, rgba(21,20,26,.05) 0 10px, transparent 10px 20px);
+    border-bottom: 1px solid var(--line); }
+  .thumb-soon svg { width:34px; height:34px; color:var(--ink-soft); opacity:.35; }
+
+  .card-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .card-status { font-family:'Inter',sans-serif; font-weight:700; font-size:10px; text-transform:uppercase; letter-spacing:.07em; display:inline-flex; align-items:center; gap:5px; margin-bottom:2px; }
+  .card-status .dot { width:6px; height:6px; border-radius:50%; }
+  .card.available .card-status { color:#1A7A3C; }
+  .card.available .card-status .dot { background:#2FAF5C; }
+  .card.soon .card-status { color:var(--ink-soft); opacity:.7; }
+  .card.soon .card-status .dot { background:#B9B4A8; }
+
+  .card-title { font-family:'Inter',sans-serif; font-weight:700; font-size:15.5px; margin:0; }
+  .card.soon .card-title { color: var(--ink-soft); }
+  .card-desc { font-size:12.5px; line-height:1.55; color:var(--ink-soft); margin:0; }
+  .card-cta { margin-top:10px; font-family:'Inter',sans-serif; font-weight:700; font-size:12.5px; color:var(--be-red); display:flex; align-items:center; gap:5px; }
+  .card-cta svg { width:13px; height:13px; transition: transform .15s ease; }
+  .card.available:hover .card-cta svg { transform: translateX(3px); }
+
+  @media (max-width: 600px) {
+    .masthead { padding: 18px 20px; }
+    .intro { padding: 28px 20px 6px; }
+    .grid-wrap { padding: 24px 20px 50px; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="masthead">
+    <a href="../../index.html" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Semua Page
+    </a>
+    <div class="masthead-title"><span class="masthead-dot"></span>Bali Express</div>
+  </header>
+
+  <section class="intro">
+    <p class="intro-eyebrow">Pilih Template</p>
+    <h2>Template untuk konten Bali Express</h2>
+    <p>Klik untuk buka & edit. Klik kanan → "Open in new tab" kalau mau bandingin beberapa template sekaligus.</p>
+  </section>
+
+  <section class="grid-wrap">
+    <div class="grid" id="templateGrid"></div>
+  </section>
+
+<script>
+  const TEMPLATES = [
+    { name: 'Highlight', desc: 'Foto penuh satu layar dengan judul di kotak merah menempel di bagian bawah. Gaya paling umum buat konten breaking news.', href: '../../templates/bali-express/highlight/index.html', available: true },
+    { name: 'Template 2', desc: 'Segera hadir — kirim referensi desainnya biar langsung dibuatin.', href: '../../templates/bali-express/template-2/index.html', available: false },
+    { name: 'Template 3', desc: 'Segera hadir — kirim referensi desainnya biar langsung dibuatin.', href: '../../templates/bali-express/template-3/index.html', available: false },
+    { name: 'Template 4', desc: 'Segera hadir — kirim referensi desainnya biar langsung dibuatin.', href: '../../templates/bali-express/template-4/index.html', available: false },
+    { name: 'Template 5', desc: 'Segera hadir — kirim referensi desainnya biar langsung dibuatin.', href: '../../templates/bali-express/template-5/index.html', available: false },
+  ];
+
+  const grid = document.getElementById('templateGrid');
+  const lockIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  const arrowIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>';
+
+  TEMPLATES.forEach(t => {
+    const card = document.createElement('a');
+    card.className = 'card ' + (t.available ? 'available' : 'soon');
+    card.href = t.href;
+
+    const thumb = t.available
+      ? `<div class="preview-wrapper"><iframe src="${t.href}" tabindex="-1" scrolling="no"></iframe></div>`
+      : `<div class="thumb-soon">${lockIcon}</div>`;
+
+    card.innerHTML = `
+      ${thumb}
+      <div class="card-body">
+        <span class="card-status"><span class="dot"></span>${t.available ? 'Tersedia' : 'Segera Hadir'}</span>
+        <h3 class="card-title">${t.name}</h3>
+        <p class="card-desc">${t.desc}</p>
+        ${t.available ? `<span class="card-cta">Buka template ${arrowIcon}</span>` : ''}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+</script>
+<script src="../_preview-scale.js"></script>
+<script>initLivePreviews();</script>
+
+</body>
+</html>
