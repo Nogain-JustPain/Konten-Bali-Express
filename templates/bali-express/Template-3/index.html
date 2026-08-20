@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generator Konten — Bali Express (Highlight)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,700;0,800;1,300;1,400&family=Poppins:wght@300;400;700;800&family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root { --be-red:#E8412C; --be-red-dark:#C42E1B; --ink:#15141A; --ink-soft:#4A4854; --paper:#FAFAF8; --line:#E5E2DC; --panel:#FFFFFF; --band-dark:#1A1A1A; --band-cream:#FBFAF5; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; }
+  .app { display:grid; grid-template-columns:380px 1fr; min-height:100vh; }
+  @media(max-width:900px){.app{grid-template-columns:1fr}}
+  .panel { background:var(--panel); border-right:1px solid var(--line); padding:28px 26px 40px; display:flex; flex-direction:column; gap:22px; }
+  .brand-row { display:flex; align-items:center; gap:10px; padding-bottom:18px; border-bottom:2px solid var(--ink); }
+  .brand-mark { width:10px; height:28px; background:var(--be-red); flex-shrink:0; }
+  .brand-row h1 { font-size:17px; font-weight:800; margin:0; line-height:1.2; }
+  .brand-row span { display:block; font-size:11px; font-weight:600; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.08em; margin-top:2px; }
+  .field { display:flex; flex-direction:column; gap:8px; }
+  .field label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); }
+  textarea { width:100%; border:1.5px solid var(--line); border-radius:6px; padding:12px 13px; font-size:15px; font-family:inherit; color:var(--ink); background:var(--paper); resize:vertical; min-height:84px; line-height:1.4; transition:border-color .15s; }
+  textarea:focus { outline:none; border-color:var(--be-red); }
+  input[type="text"] { width:100%; border:1.5px solid var(--line); border-radius:6px; padding:12px 13px; font-size:15px; font-family:inherit; color:var(--ink); background:var(--paper); transition:border-color .15s; box-sizing:border-box; }
+  input[type="text"]:focus { outline:none; border-color:var(--be-red); }
+  .char-count { font-size:11px; color:var(--ink-soft); text-align:right; }
+  .char-count.warn { color:var(--be-red); font-weight:700; }
+  .dropzone { border:2px dashed var(--line); border-radius:8px; padding:22px 16px; text-align:center; cursor:pointer; transition:border-color .15s,background .15s; position:relative; }
+  .dropzone:hover,.dropzone.dragover { border-color:var(--be-red); background:#FFF5F3; }
+  .dropzone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .dropzone-icon { font-size:26px; margin-bottom:6px; opacity:.5; }
+  .dropzone-text { font-size:13px; color:var(--ink-soft); font-weight:600; }
+  .dropzone-text b { color:var(--be-red); }
+  .dropzone-sub { font-size:11px; color:var(--ink-soft); margin-top:3px; }
+  .dropzone.has-image .dropzone-icon,.dropzone.has-image .dropzone-text,.dropzone.has-image .dropzone-sub { display:none; }
+  .preview-thumb { display:none; width:100%; border-radius:6px; overflow:hidden; }
+  .dropzone.has-image .preview-thumb { display:block; }
+  .preview-thumb img { width:100%; height:90px; object-fit:cover; display:block; }
+  .remove-img { display:none; margin-top:8px; font-size:12px; font-weight:700; color:var(--be-red); background:none; border:none; cursor:pointer; text-decoration:underline; padding:0; }
+  .dropzone.has-image + .remove-img { display:inline-block; }
+  .download-btn { margin-top:6px; width:100%; padding:15px; background:var(--ink); color:#fff; border:none; border-radius:7px; font-size:15px; font-weight:800; cursor:pointer; transition:background .15s,transform .1s; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .download-btn:hover { background:var(--be-red-dark); }
+  .download-btn:active { transform:scale(.98); }
+  .download-btn:disabled { background:var(--line); color:var(--ink-soft); cursor:not-allowed; }
+  .status-msg { font-size:12px; color:var(--ink-soft); text-align:center; min-height:16px; }
+  .status-msg.error { color:var(--be-red); font-weight:600; }
+  .status-msg.success { color:#1a7a3c; font-weight:600; }
+  .editor-toolbar { display:flex; align-items:center; gap:6px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:8px 10px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+  .tool-btn { width:38px; height:38px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:9px; border:none; background:transparent; color:var(--ink); cursor:pointer; transition:all .15s; }
+  .tool-btn svg { width:19px; height:19px; }
+  .tool-btn:hover:not(:disabled) { background:#F2F1EC; }
+  .tool-btn.active { background:var(--ink); color:#fff; }
+  .tool-btn:disabled { opacity:.35; cursor:not-allowed; }
+  .tool-sep { width:1px; height:24px; background:var(--line); margin:0 2px; flex-shrink:0; }
+  .tool-slider { display:flex; align-items:center; gap:8px; padding:0 6px; }
+  .tool-slider svg { width:15px; height:15px; color:var(--ink-soft); flex-shrink:0; }
+  .tool-slider input[type="range"] { width:90px; accent-color:var(--be-red); }
+  @media(max-width:900px){ .editor-toolbar{ padding:7px 8px; } .tool-slider input[type="range"]{ width:70px; } }
+  .preview-area { background:var(--paper); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px; padding:40px; overflow:auto; }
+  .canvas-wrap { box-shadow:0 12px 48px rgba(0,0,0,.6); border-radius:4px; overflow:visible !important; max-width:100%; position:relative; }
+  #canvas { display:block; width:360px; height:450px; background:#fff; border-radius:4px; touch-action:none; }
+  #photoOverlay { position:absolute; border:2px dashed rgba(255,255,255,.55); box-shadow:0 0 0 1px rgba(0,0,0,.4); cursor:grab; pointer-events:all; box-sizing:border-box; border-radius:2px; }
+  #photoOverlay:active { cursor:grabbing; }
+  .resize-handle { position:absolute; width:14px; height:14px; background:#fff; border:2px solid var(--be-red); border-radius:3px; box-shadow:0 1px 4px rgba(0,0,0,.5); pointer-events:all; }
+  [data-corner="NW"]{top:-7px;left:-7px;cursor:nw-resize}
+  [data-corner="NE"]{top:-7px;right:-7px;cursor:ne-resize}
+  [data-corner="SW"]{bottom:-7px;left:-7px;cursor:sw-resize}
+  [data-corner="SE"]{bottom:-7px;right:-7px;cursor:se-resize}
+  #resetPhotoBtn { position:absolute; top:-36px; right:0; padding:5px 10px; background:rgba(21,20,26,.85); color:#fff; border:none; border-radius:5px; font-size:12px; font-weight:600; cursor:pointer; transition:background .15s; pointer-events:all; display:none; white-space:nowrap; }
+  #resetPhotoBtn:hover { background:var(--be-red); }
+  @media(max-width:900px){.preview-area{padding:24px 16px}#canvas{width:300px;height:375px}}
+  .loading-screen { position:fixed; inset:0; z-index:9999; background:#FBFAF5; display:flex; align-items:center; justify-content:center; transition:opacity .5s ease, visibility .5s ease; }
+  .loading-screen.hide { opacity:0; visibility:hidden; pointer-events:none; }
+  .loading-text { font-family:'Playfair Display', Georgia, serif; font-weight:500; font-style:italic; font-size:34px; color:#3A3833; letter-spacing:.02em; opacity:0; transition:opacity .7s ease; text-align:center; padding:0 24px; }
+  .loading-text.show { opacity:1; }
+  @media(max-width:900px){.loading-text{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-text" id="loadingText"></div>
+</div>
+<div class="app">
+  <div class="panel">
+    <div class="brand-row">
+      <div class="brand-mark"></div>
+      <div><h1>Generator Konten</h1><span>Bali Express — Highlight</span></div>
+    </div>
+    <div class="field">
+      <label for="headline">Judul Headline</label>
+      <textarea id="headline" placeholder="Tulis judul berita di sini..." maxlength="160"></textarea>
+      <div class="char-count" id="charCount">0 / 160</div>
+    </div>
+    <div class="field">
+      <label for="creditInput">Kredit Foto</label>
+      <input type="text" id="creditInput" placeholder="cth: Ist / Nama Fotografer" maxlength="40">
+    </div>
+    <div class="field">
+      <label>Foto Headline</label>
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp">
+        <div class="dropzone-icon">📷</div>
+        <div class="dropzone-text"><b>Klik untuk upload</b> atau drag foto</div>
+        <div class="dropzone-sub">JPG, PNG, atau WEBP</div>
+        <div class="preview-thumb" id="previewThumb"></div>
+      </div>
+      <button class="remove-img" id="removeImg">Hapus foto</button>
+    </div>
+    <button class="download-btn" id="downloadBtn" disabled>⬇ Download JPG</button>
+    <div class="status-msg" id="statusMsg">Upload foto dulu buat mulai</div>
+  </div>
+  <div class="preview-area">
+    <div class="editor-toolbar" id="editorToolbar">
+      <button type="button" class="tool-btn" id="mosaicToggleBtn" title="Brush mosaic" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg>
+      </button>
+      <div class="tool-sep"></div>
+      <div class="tool-slider">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>
+        <input type="range" id="brushSize" min="12" max="130" value="45">
+      </div>
+      <div class="tool-sep"></div>
+      <button type="button" class="tool-btn" id="mosaicUndoBtn" title="Undo oles terakhir" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-6.7L3 9"/></svg>
+      </button>
+      <button type="button" class="tool-btn" id="mosaicClearBtn" title="Hapus semua mosaic" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+      </button>
+      <div class="tool-sep"></div>
+      <button type="button" class="tool-btn" id="gaussianToggleBtn" title="Brush gaussian blur" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/></svg>
+      </button>
+      <div class="tool-slider">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>
+        <input type="range" id="gaussianBrushSize" min="12" max="130" value="45">
+      </div>
+      <div class="tool-sep"></div>
+      <div class="tool-slider">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h2m2 0h2m2 0h2m2 0h2m2 0h2m2 0h2"/></svg>
+        <input type="range" id="gaussianIntensity" min="5" max="100" value="60">
+      </div>
+      <div class="tool-sep"></div>
+      <button type="button" class="tool-btn" id="gaussianUndoBtn" title="Undo oles gaussian blur" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-6.7L3 9"/></svg>
+      </button>
+      <button type="button" class="tool-btn" id="gaussianClearBtn" title="Hapus semua gaussian blur" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+      </button>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="canvas" width="1080" height="1350"></canvas>
+      <div id="photoOverlay" style="display:none;">
+        <div class="resize-handle" data-corner="NW"></div>
+        <div class="resize-handle" data-corner="NE"></div>
+        <div class="resize-handle" data-corner="SW"></div>
+        <div class="resize-handle" data-corner="SE"></div>
+      </div>
+      <button id="resetPhotoBtn">↺ Reset Foto</button>
+    </div>
+  </div>
+</div>
+<script>
+const LOGO_B64 = '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';
+
+// ===== CONFIG =====
+const CANVAS_W = 1080;
+const CANVAS_H = 1350;
+const WHITE = '#FFFFFF';
+const BAND_MAROON = '#8C1E0B';    // dark red/maroon band background
+const HEADLINE_TEXT_COLOR = '#FFFFFF'; // headline text color — white
+const CREDIT_TEXT_COLOR = 'rgba(255,255,255,0.75)'; // photo credit — translucent white
+const HEADLINE_FONT = "'Inter'";
+const HEADLINE_SIZE = 52;
+const HEADLINE_LINE_HEIGHT = 70;
+const BAND_PAD_TOP = 70;          // gap from top of the maroon band to the first headline line
+const CREDIT_GAP_TOP = 74;        // gap from the last headline line to the photo-credit text
+const CREDIT_SIZE = 25;
+const CREDIT_LINE_HEIGHT = 30;
+const BAND_BOTTOM_PAD = 80;       // gap from the photo-credit text to the very bottom of the canvas
+const TEXT_SIDE_MARGIN = 112;     // left/right margin for headline, logo, and credit text
+const TEXT_RIGHT_EXTRA = 60;     // extra right padding on top of TEXT_SIDE_MARGIN, so headline wraps shorter
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const headlineInput = document.getElementById('headline');
+const creditInput = document.getElementById('creditInput');
+const charCount = document.getElementById('charCount');
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const previewThumb = document.getElementById('previewThumb');
+const removeImgBtn = document.getElementById('removeImg');
+const downloadBtn = document.getElementById('downloadBtn');
+const statusMsg = document.getElementById('statusMsg');
+const mosaicToggleBtn = document.getElementById('mosaicToggleBtn');
+const mosaicUndoBtn = document.getElementById('mosaicUndoBtn');
+const mosaicClearBtn = document.getElementById('mosaicClearBtn');
+const brushSizeInput = document.getElementById('brushSize');
+const gaussianToggleBtn = document.getElementById('gaussianToggleBtn');
+const gaussianUndoBtn = document.getElementById('gaussianUndoBtn');
+const gaussianClearBtn = document.getElementById('gaussianClearBtn');
+const gaussianBrushSizeInput = document.getElementById('gaussianBrushSize');
+const gaussianIntensityInput = document.getElementById('gaussianIntensity');
+
+let uploadedImg = null;
+let logoImg = new Image();
+let logoLoaded = false;
+
+logoImg.onload = () => { logoLoaded = true; render(); };
+logoImg.src = 'data:image/png;base64,' + LOGO_B64;
+
+// ===== PHOTO TRANSFORM =====
+let photoTransform = { x: 0, y: 0, scale: 1 };
+// Tracks the photo's inner drawable rect (x, y, w, h) inside the white-bordered
+// card. Recomputed every render() since the card's height depends on how many
+// headline lines there are; drag/resize math below reads this instead of the
+// full canvas.
+let photoRect = { x: 0, y: 0, w: CANVAS_W, h: 700 };
+
+function resetPhotoTransform() {
+  photoTransform = { x: 0, y: 0, scale: 1 };
+  mosaicLayerDirty = true; gaussianLayerDirty = true;
+  updatePhotoOverlay(); render();
+}
+
+function drawImageWithTransform(img, context) {
+  context = context || ctx;
+  const ir = img.width / img.height, br = photoRect.w / photoRect.h;
+  let bW, bH;
+  if (ir > br) { bH = photoRect.h; bW = bH * ir; } else { bW = photoRect.w; bH = bW / ir; }
+  const dW = bW * photoTransform.scale, dH = bH * photoTransform.scale;
+  const dX = photoRect.x + (photoRect.w - dW) / 2 + photoTransform.x;
+  const dY = photoRect.y + (photoRect.h - dH) / 2 + photoTransform.y;
+  context.save();
+  context.beginPath(); context.rect(photoRect.x, photoRect.y, photoRect.w, photoRect.h); context.clip();
+  context.drawImage(img, dX, dY, dW, dH);
+  context.restore();
+}
+
+// ===== MOSAIC BRUSH =====
+// maskCanvas: white = "show mosaic here", black/transparent = "show original photo".
+// Painted in the same 1080x1350 coordinate space as the main canvas, so it
+// lines up with the photo as long as the photo isn't moved/resized afterward.
+const MOSAIC_BLOCK = 22; // size (in canvas px) of each mosaic square
+let maskCanvas = null, maskCtx = null;
+let mosaicLayerCanvas = null, mosaicLayerDirty = true;
+let compositeCanvas = null, compositeCtx = null;
+let mosaicMode = false;
+let isPainting = false, lastPaintPt = null;
+let brushRadius = parseInt(brushSizeInput.value, 10);
+let undoStack = [];
+
+function ensureMosaicCanvases() {
+  if (!maskCanvas) {
+    maskCanvas = document.createElement('canvas');
+    maskCanvas.width = CANVAS_W; maskCanvas.height = CANVAS_H;
+    maskCtx = maskCanvas.getContext('2d');
+  }
+  if (!compositeCanvas) {
+    compositeCanvas = document.createElement('canvas');
+    compositeCanvas.width = CANVAS_W; compositeCanvas.height = CANVAS_H;
+    compositeCtx = compositeCanvas.getContext('2d');
+  }
+}
+
+function clearMosaicMask() {
+  ensureMosaicCanvases();
+  maskCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  undoStack = [];
+  updateMosaicButtons();
+}
+
+// Rebuilds the pixelated version of the current photo (full canvas-space).
+// Only needs to run when the photo/transform changes, not on every brush
+// stroke, so it's cached and marked dirty explicitly.
+function rebuildMosaicLayer() {
+  ensureMosaicCanvases();
+  if (!mosaicLayerCanvas) {
+    mosaicLayerCanvas = document.createElement('canvas');
+    mosaicLayerCanvas.width = CANVAS_W; mosaicLayerCanvas.height = CANVAS_H;
+  }
+  const mlCtx = mosaicLayerCanvas.getContext('2d');
+  mlCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  if (!uploadedImg) { mosaicLayerDirty = false; return; }
+
+  // Draw the photo at full res into a scratch canvas the same way it's
+  // drawn on the main canvas, then shrink-and-blow-up through a tiny
+  // intermediate canvas to get the blocky pixelated look.
+  const srcCanvas = document.createElement('canvas');
+  srcCanvas.width = CANVAS_W; srcCanvas.height = CANVAS_H;
+  const srcCtx = srcCanvas.getContext('2d');
+  const ir = uploadedImg.width / uploadedImg.height, br = photoRect.w / photoRect.h;
+  let bW, bH;
+  if (ir > br) { bH = photoRect.h; bW = bH * ir; } else { bW = photoRect.w; bH = bW / ir; }
+  const dW = bW * photoTransform.scale, dH = bH * photoTransform.scale;
+  const dX = photoRect.x + (photoRect.w - dW) / 2 + photoTransform.x;
+  const dY = photoRect.y + (photoRect.h - dH) / 2 + photoTransform.y;
+  srcCtx.save();
+  srcCtx.beginPath(); srcCtx.rect(photoRect.x, photoRect.y, photoRect.w, photoRect.h); srcCtx.clip();
+  srcCtx.drawImage(uploadedImg, dX, dY, dW, dH);
+  srcCtx.restore();
+
+  const smallW = Math.max(1, Math.round(CANVAS_W / MOSAIC_BLOCK));
+  const smallH = Math.max(1, Math.round(CANVAS_H / MOSAIC_BLOCK));
+  const tinyCanvas = document.createElement('canvas');
+  tinyCanvas.width = smallW; tinyCanvas.height = smallH;
+  const tinyCtx = tinyCanvas.getContext('2d');
+  tinyCtx.imageSmoothingEnabled = true;
+  tinyCtx.drawImage(srcCanvas, 0, 0, smallW, smallH);
+
+  mlCtx.imageSmoothingEnabled = false;
+  mlCtx.drawImage(tinyCanvas, 0, 0, smallW, smallH, 0, 0, CANVAS_W, CANVAS_H);
+  mosaicLayerDirty = false;
+}
+
+// Composites the pixelated layer, masked to only the painted areas, onto
+// the main canvas. Called from render(), right where the photo is drawn.
+function drawMosaicComposite() {
+  if (!uploadedImg || !maskCanvas) return;
+  if (mosaicLayerDirty) rebuildMosaicLayer();
+  compositeCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  compositeCtx.drawImage(mosaicLayerCanvas, 0, 0);
+  compositeCtx.globalCompositeOperation = 'destination-in';
+  compositeCtx.drawImage(maskCanvas, 0, 0);
+  compositeCtx.globalCompositeOperation = 'source-over';
+  ctx.drawImage(compositeCanvas, 0, 0);
+}
+
+// ===== GAUSSIAN BLUR BRUSH =====
+// Mekanismenya sama persis kayak mosaic (mask + layer cache + undo terpisah),
+// bedanya layer-nya digambar pakai canvas filter blur, bukan dipecah jadi blok.
+let gaussianRadius = parseInt(gaussianIntensityInput.value, 10); // default 60px
+let gaussianMaskCanvas = null, gaussianMaskCtx = null;
+let gaussianLayerCanvas = null, gaussianLayerDirty = true;
+let gaussianCompositeCanvas = null, gaussianCompositeCtx = null;
+let gaussianMode = false;
+let gaussianIsPainting = false, gaussianLastPaintPt = null;
+let gaussianBrushRadius = parseInt(gaussianBrushSizeInput.value, 10);
+let gaussianUndoStack = [];
+
+function ensureGaussianCanvases() {
+  if (!gaussianMaskCanvas) {
+    gaussianMaskCanvas = document.createElement('canvas');
+    gaussianMaskCanvas.width = CANVAS_W; gaussianMaskCanvas.height = CANVAS_H;
+    gaussianMaskCtx = gaussianMaskCanvas.getContext('2d');
+  }
+  if (!gaussianCompositeCanvas) {
+    gaussianCompositeCanvas = document.createElement('canvas');
+    gaussianCompositeCanvas.width = CANVAS_W; gaussianCompositeCanvas.height = CANVAS_H;
+    gaussianCompositeCtx = gaussianCompositeCanvas.getContext('2d');
+  }
+}
+
+function clearGaussianMask() {
+  ensureGaussianCanvases();
+  gaussianMaskCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  gaussianUndoStack = [];
+  updateGaussianButtons();
+}
+
+// Membangun ulang versi blur halus dari foto saat ini (full canvas-space),
+// sama seperti mosaic: hanya dijalankan saat foto/transform/intensitas berubah.
+function rebuildGaussianLayer() {
+  ensureGaussianCanvases();
+  if (!gaussianLayerCanvas) {
+    gaussianLayerCanvas = document.createElement('canvas');
+    gaussianLayerCanvas.width = CANVAS_W; gaussianLayerCanvas.height = CANVAS_H;
+  }
+  const glCtx = gaussianLayerCanvas.getContext('2d');
+  glCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  if (!uploadedImg) { gaussianLayerDirty = false; return; }
+
+  glCtx.save();
+  glCtx.filter = `blur(${gaussianRadius}px)`;
+  drawImageWithTransform(uploadedImg, glCtx);
+  glCtx.restore();
+  gaussianLayerDirty = false;
+}
+
+function drawGaussianComposite() {
+  if (!uploadedImg || !gaussianMaskCanvas) return;
+  if (gaussianLayerDirty) rebuildGaussianLayer();
+  gaussianCompositeCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  gaussianCompositeCtx.drawImage(gaussianLayerCanvas, 0, 0);
+  gaussianCompositeCtx.globalCompositeOperation = 'destination-in';
+  gaussianCompositeCtx.drawImage(gaussianMaskCanvas, 0, 0);
+  gaussianCompositeCtx.globalCompositeOperation = 'source-over';
+  ctx.drawImage(gaussianCompositeCanvas, 0, 0);
+}
+
+function paintGaussianSegment(from, to) {
+  ensureGaussianCanvases();
+  gaussianMaskCtx.lineCap = 'round'; gaussianMaskCtx.lineJoin = 'round';
+  gaussianMaskCtx.strokeStyle = '#fff'; gaussianMaskCtx.fillStyle = '#fff';
+  gaussianMaskCtx.lineWidth = gaussianBrushRadius * 2;
+  gaussianMaskCtx.beginPath();
+  if (from) { gaussianMaskCtx.moveTo(from.x, from.y); gaussianMaskCtx.lineTo(to.x, to.y); gaussianMaskCtx.stroke(); }
+  gaussianMaskCtx.beginPath(); gaussianMaskCtx.arc(to.x, to.y, gaussianBrushRadius, 0, Math.PI * 2); gaussianMaskCtx.fill();
+}
+
+function updateGaussianButtons() {
+  const hasImg = !!uploadedImg;
+  gaussianToggleBtn.disabled = !hasImg;
+  gaussianUndoBtn.disabled = !hasImg || gaussianUndoStack.length === 0;
+  gaussianClearBtn.disabled = !hasImg || gaussianUndoStack.length === 0;
+}
+
+function startGaussianPaint(e) {
+  if (!gaussianMode || !uploadedImg) return;
+  ensureGaussianCanvases();
+  e.preventDefault();
+  gaussianUndoStack.push(gaussianMaskCtx.getImageData(0, 0, CANVAS_W, CANVAS_H));
+  if (gaussianUndoStack.length > 25) gaussianUndoStack.shift();
+  updateGaussianButtons();
+  gaussianIsPainting = true;
+  const pt = canvasPointFromEvent(e);
+  paintGaussianSegment(null, pt);
+  gaussianLastPaintPt = pt;
+  render();
+}
+function moveGaussianPaint(e) {
+  if (!gaussianIsPainting) return;
+  e.preventDefault();
+  const pt = canvasPointFromEvent(e);
+  paintGaussianSegment(gaussianLastPaintPt, pt);
+  gaussianLastPaintPt = pt;
+  render();
+}
+function endGaussianPaint() { gaussianIsPainting = false; gaussianLastPaintPt = null; }
+
+canvas.addEventListener('mousedown', startGaussianPaint);
+canvas.addEventListener('mousemove', moveGaussianPaint);
+window.addEventListener('mouseup', endGaussianPaint);
+canvas.addEventListener('touchstart', startGaussianPaint, { passive: false });
+canvas.addEventListener('touchmove', moveGaussianPaint, { passive: false });
+canvas.addEventListener('touchend', endGaussianPaint);
+canvas.addEventListener('touchcancel', endGaussianPaint);
+
+gaussianBrushSizeInput.addEventListener('input', () => {
+  gaussianBrushRadius = parseInt(gaussianBrushSizeInput.value, 10);
+  updateBrushCursor();
+});
+
+gaussianIntensityInput.addEventListener('input', () => {
+  gaussianRadius = parseInt(gaussianIntensityInput.value, 10);
+  gaussianLayerDirty = true;
+  render();
+});
+
+gaussianToggleBtn.addEventListener('click', () => {
+  gaussianMode = !gaussianMode;
+  gaussianToggleBtn.classList.toggle('active', gaussianMode);
+  if (gaussianMode) {
+    mosaicMode = false;
+    mosaicToggleBtn.classList.remove('active');
+  }
+  photoOverlay.style.pointerEvents = (mosaicMode || gaussianMode) ? 'none' : 'all';
+  updateBrushCursor();
+});
+
+gaussianUndoBtn.addEventListener('click', () => {
+  if (gaussianUndoStack.length === 0) return;
+  const snapshot = gaussianUndoStack.pop();
+  ensureGaussianCanvases();
+  gaussianMaskCtx.putImageData(snapshot, 0, 0);
+  updateGaussianButtons();
+  render();
+});
+
+gaussianClearBtn.addEventListener('click', () => {
+  if (!gaussianMaskCtx) return;
+  ensureGaussianCanvases();
+  gaussianUndoStack.push(gaussianMaskCtx.getImageData(0, 0, CANVAS_W, CANVAS_H));
+  gaussianMaskCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  updateGaussianButtons();
+  render();
+});
+
+function canvasPointFromEvent(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = CANVAS_W / rect.width, scaleY = CANVAS_H / rect.height;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+}
+
+function paintSegment(from, to) {
+  ensureMosaicCanvases();
+  maskCtx.lineCap = 'round'; maskCtx.lineJoin = 'round';
+  maskCtx.strokeStyle = '#fff'; maskCtx.fillStyle = '#fff';
+  maskCtx.lineWidth = brushRadius * 2;
+  maskCtx.beginPath();
+  if (from) { maskCtx.moveTo(from.x, from.y); maskCtx.lineTo(to.x, to.y); maskCtx.stroke(); }
+  maskCtx.beginPath(); maskCtx.arc(to.x, to.y, brushRadius, 0, Math.PI * 2); maskCtx.fill();
+}
+
+function updateMosaicButtons() {
+  const hasImg = !!uploadedImg;
+  mosaicToggleBtn.disabled = !hasImg;
+  mosaicUndoBtn.disabled = !hasImg || undoStack.length === 0;
+  mosaicClearBtn.disabled = !hasImg || undoStack.length === 0;
+}
+
+function startPaint(e) {
+  if (!mosaicMode || !uploadedImg) return;
+  ensureMosaicCanvases();
+  e.preventDefault();
+  // Snapshot the mask before this stroke so it can be undone as one step.
+  undoStack.push(maskCtx.getImageData(0, 0, CANVAS_W, CANVAS_H));
+  if (undoStack.length > 25) undoStack.shift();
+  updateMosaicButtons();
+  isPainting = true;
+  const pt = canvasPointFromEvent(e);
+  paintSegment(null, pt);
+  lastPaintPt = pt;
+  render();
+}
+function movePaint(e) {
+  if (!isPainting) return;
+  e.preventDefault();
+  const pt = canvasPointFromEvent(e);
+  paintSegment(lastPaintPt, pt);
+  lastPaintPt = pt;
+  render();
+}
+function endPaint() { isPainting = false; lastPaintPt = null; }
+
+canvas.addEventListener('mousedown', startPaint);
+canvas.addEventListener('mousemove', movePaint);
+window.addEventListener('mouseup', endPaint);
+canvas.addEventListener('touchstart', startPaint, { passive: false });
+canvas.addEventListener('touchmove', movePaint, { passive: false });
+canvas.addEventListener('touchend', endPaint);
+canvas.addEventListener('touchcancel', endPaint);
+
+brushSizeInput.addEventListener('input', () => {
+  brushRadius = parseInt(brushSizeInput.value, 10);
+  updateBrushCursor();
+});
+
+// Round cursor matching the current brush size, instead of the default
+// browser crosshair (which renders as a plus sign).
+function updateBrushCursor() {
+  if (!mosaicMode && !gaussianMode) { canvas.style.cursor = 'default'; return; }
+  const ds = getDS();
+  const radius = mosaicMode ? brushRadius : gaussianBrushRadius;
+  const color = mosaicMode ? '#E8412C' : '#8B5CF6';
+  const r = Math.max(5, Math.round(radius * ds));
+  const size = r * 2 + 4;
+  const c = size / 2;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}'><circle cx='${c}' cy='${c}' r='${r - 1}' fill='${color}2e' stroke='${color}' stroke-width='2'/></svg>`;
+  canvas.style.cursor = `url("data:image/svg+xml,${encodeURIComponent(svg)}") ${c} ${c}, crosshair`;
+}
+window.addEventListener('resize', () => { if (mosaicMode || gaussianMode) updateBrushCursor(); });
+
+mosaicToggleBtn.addEventListener('click', () => {
+  mosaicMode = !mosaicMode;
+  mosaicToggleBtn.classList.toggle('active', mosaicMode);
+  if (mosaicMode) {
+    gaussianMode = false;
+    gaussianToggleBtn.classList.remove('active');
+  }
+  photoOverlay.style.pointerEvents = (mosaicMode || gaussianMode) ? 'none' : 'all';
+  updateBrushCursor();
+});
+
+mosaicUndoBtn.addEventListener('click', () => {
+  if (undoStack.length === 0) return;
+  const snapshot = undoStack.pop();
+  ensureMosaicCanvases();
+  maskCtx.putImageData(snapshot, 0, 0);
+  updateMosaicButtons();
+  render();
+});
+
+mosaicClearBtn.addEventListener('click', () => {
+  if (!maskCtx) return;
+  ensureMosaicCanvases();
+  undoStack.push(maskCtx.getImageData(0, 0, CANVAS_W, CANVAS_H));
+  maskCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  updateMosaicButtons();
+  render();
+});
+
+// ===== HELPERS =====
+function wrapText(context, text, maxWidth) {
+  const paragraphs = text.split('\n');
+  const lines = [];
+  for (const para of paragraphs) {
+    if (para === '') { lines.push(''); continue; } // preserve blank lines from Enter
+    const words = para.split(' ');
+    let cur = '';
+    for (const w of words) {
+      const test = cur ? cur + ' ' + w : w;
+      if (context.measureText(test).width > maxWidth && cur) { lines.push(cur); cur = w; }
+      else cur = test;
+    }
+    if (cur) lines.push(cur);
+  }
+  return lines;
+}
+
+// Rounded-rect path helper (used for the photo frame)
+// Like roundedRectPath, but each corner can have its own radius — used for
+// the logo badge, whose top-left corner must match the photo's rounding
+// while its other corners behave like a normal little tag.
+function roundedRectCornersPath(x, y, w, h, r) {
+  const { tl = 0, tr = 0, br = 0, bl = 0 } = r;
+  ctx.beginPath();
+  ctx.moveTo(x + tl, y);
+  ctx.lineTo(x + w - tr, y);
+  ctx.arcTo(x + w, y, x + w, y + tr, tr);
+  ctx.lineTo(x + w, y + h - br);
+  ctx.arcTo(x + w, y + h, x + w - br, y + h, br);
+  ctx.lineTo(x + bl, y + h);
+  ctx.arcTo(x, y + h, x, y + h - bl, bl);
+  ctx.lineTo(x, y + tl);
+  ctx.arcTo(x, y, x + tl, y, tl);
+  ctx.closePath();
+}
+
+function roundedRectPath(x, y, w, h, r) {
+  const rr = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rr, y);
+  ctx.arcTo(x + w, y, x + w, y + h, rr);
+  ctx.arcTo(x + w, y + h, x, y + h, rr);
+  ctx.arcTo(x, y + h, x, y, rr);
+  ctx.arcTo(x, y, x + w, y, rr);
+  ctx.closePath();
+}
+
+// Rounded polygon path helper — takes a closed list of vertices (clockwise)
+// and rounds every corner uniformly using arcTo. Works for both convex and
+// concave corners, which is what lets us build the "stepped" headline
+// highlight (each line hugs its own text width, corners flow into each other).
+function roundedPolygonPath(pts, radius) {
+  const n = pts.length;
+  const radii = Array.isArray(radius) ? radius : new Array(n).fill(radius);
+  const dist = (a, b) => Math.hypot(b.x - a.x, b.y - a.y);
+  const pointToward = (a, b, d) => {
+    const len = dist(a, b) || 1;
+    const t = Math.min(d, len / 2) / len;
+    return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+  };
+  const start = pointToward(pts[n - 1], pts[0], radii[0]);
+  ctx.beginPath();
+  ctx.moveTo(start.x, start.y);
+  for (let i = 0; i < n; i++) {
+    const curr = pts[i];
+    const next = pts[(i + 1) % n];
+    ctx.arcTo(curr.x, curr.y, next.x, next.y, radii[i]);
+  }
+  ctx.closePath();
+}
+
+// ===== MAIN RENDER =====
+// Computes the headline wrapping + the photo card's rect together, since the
+// card's height depends on how many lines the headline wraps into. Shared by
+// render() and updatePhotoOverlay()/drag-resize so the drag handles always
+// line up with the actual photo area.
+function computeLayout() {
+  const headlineRaw = headlineInput.value.trim() || 'Judul headline berita akan tampil di sini';
+  const headline = headlineRaw;
+  const textLeft = TEXT_SIDE_MARGIN;
+  const textRightMargin = TEXT_SIDE_MARGIN + TEXT_RIGHT_EXTRA;
+  const fontSize = HEADLINE_SIZE, lineHeight = HEADLINE_LINE_HEIGHT;
+  const maxTextW = CANVAS_W - textLeft - textRightMargin;
+  ctx.font = `700 ${fontSize}px ${HEADLINE_FONT}, Arial, sans-serif`;
+  ctx.textAlign = 'left';
+
+  const lines = wrapText(ctx, headline, maxTextW);
+  const maxLines = 5;
+  const shown = lines.slice(0, maxLines);
+  if (lines.length > maxLines) {
+    let last = shown[maxLines - 1];
+    while (ctx.measureText(last + '...').width > maxTextW && last.includes(' '))
+      last = last.slice(0, last.lastIndexOf(' '));
+    shown[maxLines - 1] = last + '...';
+  }
+
+  const textBlockH = shown.length * lineHeight;
+
+  // Bottom-up layout: the maroon band fills all the way to the bottom of the
+  // canvas (no separate footer strip) — headline sits near its top, photo
+  // credit sits below the headline block with its own gap. Photo fills the
+  // remaining space above the band (full-bleed, no frame).
+  const bandH = BAND_PAD_TOP + textBlockH + CREDIT_GAP_TOP + CREDIT_LINE_HEIGHT + BAND_BOTTOM_PAD;
+  const bandTop = CANVAS_H - bandH;
+  const textTop = bandTop + BAND_PAD_TOP;
+  const creditTop = textTop + textBlockH + CREDIT_GAP_TOP;
+
+  const photoRectLayout = { x: 0, y: 0, w: CANVAS_W, h: Math.max(bandTop, 200) };
+
+  return {
+    fontSize, lineHeight, textLeft, shown, textTop, creditTop,
+    bandTop, bandH,
+    innerX: photoRectLayout.x, innerY: photoRectLayout.y, innerW: photoRectLayout.w, innerH: photoRectLayout.h,
+  };
+}
+
+function render() {
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+
+  // Maroon base (shows through as the bottom band)
+  ctx.fillStyle = BAND_MAROON;
+  ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+  const L = computeLayout();
+  // Keep the global photoRect in sync so drag/resize interactions (further
+  // down in this file) always match where the photo is actually drawn.
+  photoRect = { x: L.innerX, y: L.innerY, w: L.innerW, h: L.innerH };
+
+  // Photo — full-bleed at the top of the canvas, straight edges, clipped to
+  // its rect so it never bleeds into the dark headline band below it.
+  ctx.save();
+  ctx.beginPath(); ctx.rect(L.innerX, L.innerY, L.innerW, L.innerH); ctx.clip();
+
+  if (uploadedImg) {
+    drawImageWithTransform(uploadedImg);
+    drawMosaicComposite();
+    drawGaussianComposite();
+  } else {
+    // Blank template state: plain white area, no placeholder message
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(L.innerX, L.innerY, L.innerW, L.innerH);
+  }
+
+  // Logo — the real "BALI EXPRESS" logo image, on a clean white badge flush
+  // with the top-left canvas corner (only the bottom-right corner rounded).
+  if (logoLoaded) {
+    const logoW = 230, logoH = logoW * (logoImg.height / logoImg.width);
+    const padL = 22, padT = 16, padR = 22, padB = 16;
+    const badgeW = padL + logoW + padR;
+    const badgeH = padT + logoH + padB;
+    const corner = 18;
+
+    roundedRectCornersPath(0, 0, badgeW, badgeH, { tl: 0, tr: 0, br: corner, bl: 0 });
+    ctx.fillStyle = WHITE;
+    ctx.fill();
+
+    ctx.drawImage(logoImg, padL, padT, logoW, logoH);
+  }
+
+  ctx.restore(); // undo the photo clip
+
+  // Maroon headline band — sits directly under the photo, height adapts to
+  // however many lines the headline wraps into.
+  ctx.fillStyle = BAND_MAROON;
+  ctx.fillRect(0, L.bandTop, CANVAS_W, L.bandH);
+
+  // Headline text — bold white Helvetica Neue, left-aligned, no background box.
+  ctx.font = `700 ${L.fontSize}px ${HEADLINE_FONT}, Arial, sans-serif`;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = HEADLINE_TEXT_COLOR;
+  // Helvetica Neue's cap-height sits at roughly 0.72 of the font size — using
+  // that as the baseline offset keeps the headline vertically centered in its line.
+  const capOffset = L.fontSize * 0.72;
+  L.shown.forEach((line, i) => {
+    const rowTop = L.textTop + i * L.lineHeight;
+    ctx.fillText(line, L.textLeft, rowTop + capOffset);
+  });
+
+  // Photo credit — small translucent white caption, directly inside the
+  // maroon band below the headline.
+  ctx.font = `400 ${CREDIT_SIZE}px ${HEADLINE_FONT}, Arial, sans-serif`;
+  ctx.fillStyle = CREDIT_TEXT_COLOR;
+  const creditRaw = creditInput.value.trim();
+  ctx.fillText(`Foto : ${creditRaw}`, L.textLeft, L.creditTop + CREDIT_SIZE * 0.72);
+}
+
+// ===== EVENTS =====
+headlineInput.addEventListener('input', () => {
+  const len = headlineInput.value.length;
+  charCount.textContent = `${len} / 160`;
+  charCount.classList.toggle('warn', len > 140);
+  render();
+  updatePhotoOverlay();
+});
+
+creditInput.addEventListener('input', () => { render(); });
+
+function handleFile(file) {
+  if (!file || !file.type.startsWith('image/')) { setStatus('File harus berupa gambar', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      uploadedImg = img; photoTransform = { x: 0, y: 0, scale: 1 };
+      clearMosaicMask(); mosaicLayerDirty = true;
+      clearGaussianMask(); gaussianLayerDirty = true;
+      dropzone.classList.add('has-image'); previewThumb.innerHTML = '';
+      const t = document.createElement('img'); t.src = e.target.result; previewThumb.appendChild(t);
+      downloadBtn.disabled = false;
+      setStatus('Foto berhasil dimuat. Siap download.', 'success');
+      render(); updatePhotoOverlay();
+    };
+    img.onerror = () => setStatus('Gagal memuat gambar', 'error');
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+fileInput.addEventListener('change', (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+document.addEventListener('paste', (e) => {
+  const items = e.clipboardData && e.clipboardData.items; if (!items) return;
+  for (const item of items) { if (item.type.startsWith('image/')) { const f = item.getAsFile(); if (f) { handleFile(f); e.preventDefault(); } break; } }
+});
+removeImgBtn.addEventListener('click', () => {
+  uploadedImg = null; fileInput.value = ''; dropzone.classList.remove('has-image'); previewThumb.innerHTML = '';
+  downloadBtn.disabled = true; photoTransform = { x: 0, y: 0, scale: 1 };
+  clearMosaicMask();
+  clearGaussianMask();
+  mosaicMode = false; mosaicToggleBtn.classList.remove('active');
+  gaussianMode = false; gaussianToggleBtn.classList.remove('active');
+  photoOverlay.style.pointerEvents = 'all'; canvas.style.cursor = 'default';
+  setStatus('Upload foto dulu buat mulai', ''); updatePhotoOverlay(); render();
+});
+downloadBtn.addEventListener('click', () => {
+  try {
+    const link = document.createElement('a');
+    const safe = (headlineInput.value.trim() || 'konten').toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-').slice(0, 50);
+    link.download = `bali-express-highlight-${safe}.jpg`;
+    link.href = canvas.toDataURL('image/jpeg', 0.92); link.click();
+    setStatus('Berhasil di-download!', 'success');
+  } catch { setStatus('Gagal export, coba lagi', 'error'); }
+});
+function setStatus(msg, type) { statusMsg.textContent = msg; statusMsg.className = 'status-msg' + (type ? ' ' + type : ''); }
+
+// ===== PHOTO OVERLAY =====
+const photoOverlay = document.getElementById('photoOverlay');
+const resetPhotoBtn = document.getElementById('resetPhotoBtn');
+function getDS() { return canvas.offsetWidth / CANVAS_W; }
+function updatePhotoOverlay() {
+  if (!uploadedImg) { photoOverlay.style.display = 'none'; resetPhotoBtn.style.display = 'none'; return; }
+  resetPhotoBtn.style.display = 'block';
+  const ds = getDS(), ir = uploadedImg.width / uploadedImg.height, br = photoRect.w / photoRect.h;
+  let bW, bH;
+  if (ir > br) { bH = photoRect.h; bW = bH * ir; } else { bW = photoRect.w; bH = bW / ir; }
+  const dW = bW * photoTransform.scale * ds, dH = bH * photoTransform.scale * ds;
+  const dX = (photoRect.x + (photoRect.w - bW * photoTransform.scale) / 2 + photoTransform.x) * ds;
+  const dY = (photoRect.y + (photoRect.h - bH * photoTransform.scale) / 2 + photoTransform.y) * ds;
+  photoOverlay.style.display = 'block';
+  photoOverlay.style.left = dX + 'px'; photoOverlay.style.top = dY + 'px';
+  photoOverlay.style.width = dW + 'px'; photoOverlay.style.height = dH + 'px';
+}
+
+let isDragging = false, dragStart = {x:0,y:0}, tAtDrag = {x:0,y:0};
+photoOverlay.addEventListener('mousedown', (e) => {
+  if (e.target !== photoOverlay) return;
+  isDragging = true; dragStart = {x:e.clientX,y:e.clientY}; tAtDrag = {...photoTransform}; e.preventDefault();
+});
+let activeHandle = null, resizeStart = {};
+document.querySelectorAll('.resize-handle').forEach(h => {
+  h.addEventListener('mousedown', (e) => {
+    activeHandle = h.dataset.corner; resizeStart = { mx: e.clientX, my: e.clientY, scale: photoTransform.scale };
+    e.preventDefault(); e.stopPropagation();
+  });
+});
+document.addEventListener('mousemove', (e) => {
+  const ds = getDS();
+  if (isDragging) { photoTransform.x = tAtDrag.x + (e.clientX - dragStart.x) / ds; photoTransform.y = tAtDrag.y + (e.clientY - dragStart.y) / ds; updatePhotoOverlay(); render(); }
+  if (activeHandle && uploadedImg) {
+    const dx = (e.clientX - resizeStart.mx) / ds, dy = (e.clientY - resizeStart.my) / ds;
+    let delta = 0;
+    if (activeHandle === 'SE') delta = (dx+dy)/2;
+    if (activeHandle === 'NW') delta = -(dx+dy)/2;
+    if (activeHandle === 'NE') delta = (dx-dy)/2;
+    if (activeHandle === 'SW') delta = (-dx+dy)/2;
+    const ir = uploadedImg.width / uploadedImg.height, br = photoRect.w / photoRect.h;
+    const bW = ir > br ? photoRect.h * ir : photoRect.w;
+    photoTransform.scale = Math.max(0.3, Math.min(5, resizeStart.scale + delta / bW));
+    render(); updatePhotoOverlay();
+  }
+});
+document.addEventListener('mouseup', () => { if (isDragging || activeHandle) { mosaicLayerDirty = true; gaussianLayerDirty = true; } isDragging = false; activeHandle = null; });
+photoOverlay.addEventListener('touchstart', (e) => {
+  if (e.target !== photoOverlay) return;
+  const t = e.touches[0]; isDragging = true; dragStart = {x:t.clientX,y:t.clientY}; tAtDrag = {...photoTransform}; e.preventDefault();
+}, { passive: false });
+document.addEventListener('touchmove', (e) => {
+  if (!isDragging) return;
+  const t = e.touches[0], ds = getDS();
+  photoTransform.x = tAtDrag.x + (t.clientX - dragStart.x) / ds;
+  photoTransform.y = tAtDrag.y + (t.clientY - dragStart.y) / ds;
+  updatePhotoOverlay(); render(); e.preventDefault();
+}, { passive: false });
+document.addEventListener('touchend', () => { if (isDragging) { mosaicLayerDirty = true; gaussianLayerDirty = true; } isDragging = false; });
+resetPhotoBtn.addEventListener('click', resetPhotoTransform);
+window.addEventListener('resize', updatePhotoOverlay);
+
+// ===== LOADING SCREEN =====
+// Shows just ONE word per page load — not a cycling animation. Which word
+// comes up is tracked in localStorage as a "shuffle bag": every word is
+// guaranteed to appear once (in random order) before any word repeats,
+// then the bag reshuffles and the cycle starts again on a later reload.
+const LOADING_TEXTS = ['Semangat!', '화이팅!', '頑張って！', 'Forza!', 'Bon courage !', "Let's Go!"];
+const LOADING_BAG_KEY = 'be_loading_bag_v1';
+
+function shuffledCopy(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function nextLoadingTextPersisted() {
+  let bag = [];
+  try { bag = JSON.parse(localStorage.getItem(LOADING_BAG_KEY) || '[]'); } catch (e) { bag = []; }
+  if (!Array.isArray(bag) || bag.length === 0) bag = shuffledCopy(LOADING_TEXTS);
+
+  const word = bag.pop();
+  try { localStorage.setItem(LOADING_BAG_KEY, JSON.stringify(bag)); } catch (e) { /* storage unavailable, ignore */ }
+  return word;
+}
+
+const loadingScreen = document.getElementById('loadingScreen');
+const loadingTextEl = document.getElementById('loadingText');
+
+loadingTextEl.textContent = nextLoadingTextPersisted();
+requestAnimationFrame(() => loadingTextEl.classList.add('show'));
+
+const LOADING_MIN_MS = 1100; // keep the splash up at least this long so it never just flashes
+const loadingStartedAt = Date.now();
+function hideLoadingScreen() {
+  const wait = Math.max(0, LOADING_MIN_MS - (Date.now() - loadingStartedAt));
+  setTimeout(() => {
+    loadingScreen.classList.add('hide');
+  }, wait);
+}
+
+// ===== INIT =====
+function waitForFont() {
+  if (document.fonts && document.fonts.load) {
+    return Promise.all([document.fonts.load('700 52px Inter'), document.fonts.load('400 20px Inter')]).catch(()=>{}).then(()=>document.fonts.ready);
+  }
+  return Promise.resolve();
+}
+waitForFont().then(() => { render(); hideLoadingScreen(); });
+render();
+
+</script>
+</body>
+</html>
