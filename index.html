@@ -46,8 +46,8 @@
     display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 32px;
   }
 
-  /* ===== CARD: thumbnail statis (JPEG 1080x1350, contain biar gak kepotong) + nama + tombol Pakai di bawah ===== */
-  a.card, .card { width: 160px; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit; }
+  /* ===== CARD: thumbnail statis (JPEG 1080x1350, contain biar gak kepotong) + nama di bawah ===== */
+  a.card, .card { width: 190px; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit; }
 
   .card-thumb {
     width: 100%; aspect-ratio: 1080/1350; border-radius: 16px; overflow: hidden;
@@ -71,13 +71,13 @@
   }
   a.card:hover .card-overlay { opacity: 1; }
   .card-overlay span {
-    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500; font-size: 16px;
+    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500; font-size: 18px;
     color: #fff; letter-spacing: .01em;
   }
 
   /* -- Nama template, di bawah foto -- */
   .card-name {
-    text-align: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 12.5px;
+    text-align: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 13.5px;
     color: var(--ink); line-height: 1.3;
   }
   .card.soon .card-name { color: var(--ink-soft); }
@@ -90,7 +90,7 @@
   @media (max-width: 600px) {
     .page-title { padding: 48px 20px 0; }
     .page-subtitle { margin: 6px 0 42px; }
-    .card { width: 130px; }
+    .card { width: 150px; }
     .section-head .rule { max-width: 90px; }
   }
 </style>
