@@ -6,10 +6,10 @@
 <title>Generator Konten — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&family=Inter:wght@600;700;800&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #15141A; --ink-soft: #4A4854; --paper: #FAFAF8; --line: #E5E2DC; --card-dark: #1C1B20;
+    --ink: #15141A; --ink-soft: #4A4854; --paper: #FAFAF8; --line: #E5E2DC; --card-bg: #EFEDE7;
   }
   * { box-sizing: border-box; }
   body {
@@ -17,61 +17,73 @@
     font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased;
   }
 
+  /* ===== HEADER: big elegant title, subtitle mepet di bawahnya ===== */
   .page-title {
-    text-align: center; padding: 56px 24px 0;
-    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500;
-    font-size: clamp(36px, 5vw, 48px); letter-spacing: -.01em; margin: 0;
+    text-align: center; margin: 0; padding: 64px 24px 0;
+    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600;
+    font-size: clamp(38px, 5.4vw, 54px); letter-spacing: -.01em; line-height: 1.1;
   }
   .page-subtitle {
-    text-align: center; font-size: 13.5px; color: var(--ink-soft); margin: 6px 0 54px;
+    text-align: center; font-size: 13.5px; color: var(--ink-soft); margin: 6px 0 56px;
   }
 
-  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px 90px; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 32px 100px; }
 
-  .page-section { margin-bottom: 58px; }
+  .page-section { margin-bottom: 54px; }
   .page-section:last-child { margin-bottom: 0; }
 
+  /* ===== SECTION TAG: rata kiri, font beda dari judul utama (bukan italic) ===== */
   .section-head {
-    display: flex; align-items: center; justify-content: flex-start; gap: 18px; margin-bottom: 26px;
+    display: flex; align-items: center; gap: 16px; margin-bottom: 22px;
   }
   .section-head h2 {
-    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500;
-    font-size: 21px; margin: 0; white-space: nowrap;
+    font-family: 'Inter', sans-serif; font-weight: 800; font-size: 13.5px;
+    text-transform: uppercase; letter-spacing: .12em; margin: 0; white-space: nowrap; color: var(--ink);
   }
-  .section-head .rule { flex: 1; max-width: 220px; height: 1px; background: var(--ink); opacity: .35; }
+  .section-head .rule { flex: 1; max-width: 200px; height: 1px; background: var(--ink); opacity: .3; }
 
   .card-row {
-    display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 18px;
+    display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 20px;
   }
 
-  .card {
-    width: 158px; aspect-ratio: 3/4; border-radius: 22px; overflow: hidden; position: relative;
-    text-decoration: none; display: flex; align-items: flex-end; justify-content: center;
-    background: var(--card-dark); transition: transform .18s ease, box-shadow .18s ease;
-  }
-  .card.available:hover { transform: translateY(-5px); box-shadow: 0 14px 28px rgba(21,20,26,.22); }
-  .card.soon { opacity: .55; cursor: default; }
+  /* ===== CARD: thumbnail statis (JPEG 1080x1350, contain biar gak kepotong) + tombol Pakai di bawah ===== */
+  a.card, .card { width: 160px; display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: inherit; }
 
-  .card-label {
-    position: relative; z-index: 2; width: 100%; text-align: center; padding: 16px 10px;
+  .card-thumb {
+    width: 100%; aspect-ratio: 1080/1350; border-radius: 16px; overflow: hidden;
+    background: var(--card-bg); position: relative; border: 1px solid var(--line);
+    transition: border-color .18s ease;
+  }
+  a.card:hover .card-thumb { border-color: var(--ink); }
+  .card-thumb img {
+    width: 100%; height: 100%; object-fit: contain; display: block;
+  }
+  .card.soon .card-thumb {
+    display: flex; align-items: center; justify-content: center;
+    background-image: repeating-linear-gradient(135deg, rgba(21,20,26,.05) 0 10px, transparent 10px 20px);
+  }
+  .card.soon .card-thumb svg { width: 26px; height: 26px; color: var(--ink-soft); opacity: .35; }
+
+  /* -- "Pakai" itu bagian dari <a> yang sama (bukan link terpisah), biar klik-kanan
+     "open in new tab" tetap jalan di manapun card-nya diklik, bukan cuma di tombolnya -- */
+  .card-cta {
+    display: block; text-align: center;
     font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500; font-size: 13.5px;
-    color: #fff; background: linear-gradient(to top, rgba(0,0,0,.55), transparent);
+    color: #fff; background: var(--ink); border-radius: 999px; padding: 9px 0;
+    transition: background .18s ease, transform .18s ease;
   }
-  .card.soon .card-label { color: rgba(255,255,255,.75); }
+  a.card:hover .card-cta { background: #3A3833; transform: translateY(-2px); }
 
-  .card-preview { position: absolute; inset: 0; overflow: hidden; }
-  .card-preview iframe { position:absolute; top:0; left:0; border:none; transform-origin: top left; pointer-events:none; background:#fff; }
-
-  .card.soon .card-icon {
-    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
-    width: 26px; height: 26px; color: rgba(255,255,255,.4);
+  .card-cta-soon {
+    display: block; text-align: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 11.5px;
+    color: var(--ink-soft); opacity: .65; border-radius: 999px; padding: 9px 0; border: 1px solid var(--line);
   }
 
   @media (max-width: 600px) {
-    .page-title { padding: 42px 20px 6px; }
-    .page-subtitle { margin-bottom: 40px; }
+    .page-title { padding: 48px 20px 0; }
+    .page-subtitle { margin: 6px 0 42px; }
     .card { width: 130px; }
-    .section-head .rule { max-width: 100px; }
+    .section-head .rule { max-width: 90px; }
   }
 </style>
 </head>
@@ -83,13 +95,14 @@
   <div class="wrap" id="sections"></div>
 
 <script>
-  const BASE_WIDTH = 1280; // assumed natural width of live template pages, for preview scaling
-
+  // Tiap template yang udah TERSEDIA butuh gambar thumbnail JPEG (1080x1350) ditaro di
+  // assets/thumbnails/ dengan nama file sesuai "thumb" di bawah ini. Kalau gambarnya belum
+  // ada / gagal dimuat, kotaknya otomatis fallback jadi warna polos (gak nampilin ikon rusak).
   const PAGES = [
     {
       name: 'Bali Express',
       templates: [
-        { name: 'Highlight', href: 'templates/bali-express/highlight/index.html', available: true },
+        { name: 'Highlight', href: 'templates/bali-express/highlight/index.html', thumb: 'assets/thumbnails/bali-express-highlight.jpg', available: true },
         { name: 'Template', href: 'templates/bali-express/template-2/index.html', available: false },
         { name: 'Template', href: 'templates/bali-express/template-3/index.html', available: false },
         { name: 'Template', href: 'templates/bali-express/template-4/index.html', available: false },
@@ -121,7 +134,7 @@
     },
   ];
 
-  const lockIcon = '<svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  const lockIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
   const sectionsEl = document.getElementById('sections');
 
@@ -130,10 +143,15 @@
     section.className = 'page-section';
 
     const row = page.templates.map(t => {
-      const inner = t.available
-        ? `<div class="card-preview"><iframe src="${t.href}" tabindex="-1" scrolling="no"></iframe></div><span class="card-label">${t.name}</span>`
-        : `${lockIcon}<span class="card-label">${t.name}</span>`;
-      return `<a class="card ${t.available ? 'available' : 'soon'}" href="${t.href}">${inner}</a>`;
+      const thumb = t.available
+        ? `<div class="card-thumb"><img src="${t.thumb}" alt="${t.name}" loading="lazy" onerror="this.style.display='none'"></div>`
+        : `<div class="card-thumb">${lockIcon}</div>`;
+      const cta = t.available
+        ? `<span class="card-cta">Pakai</span>`
+        : `<span class="card-cta-soon">Segera Hadir</span>`;
+      const tag = t.available ? 'a' : 'div';
+      const hrefAttr = t.available ? ` href="${t.href}"` : '';
+      return `<${tag} class="card ${t.available ? 'available' : 'soon'}"${hrefAttr}>${thumb}${cta}</${tag}>`;
     }).join('');
 
     section.innerHTML = `
@@ -142,29 +160,6 @@
     `;
     sectionsEl.appendChild(section);
   });
-
-  // Scale every live iframe preview to fit its card, and keep it correct on resize.
-  function scalePreview(wrapper) {
-    const iframe = wrapper.querySelector('iframe');
-    if (!iframe) return;
-    const w = wrapper.clientWidth, h = wrapper.clientHeight;
-    if (!w || !h) return;
-    const scale = w / BASE_WIDTH;
-    iframe.style.width = BASE_WIDTH + 'px';
-    iframe.style.height = (h / scale) + 'px';
-    iframe.style.transform = `scale(${scale})`;
-  }
-  function initPreviews() {
-    const wrappers = document.querySelectorAll('.card-preview');
-    wrappers.forEach(scalePreview);
-    if ('ResizeObserver' in window) {
-      const ro = new ResizeObserver(entries => entries.forEach(e => scalePreview(e.target)));
-      wrappers.forEach(w => ro.observe(w));
-    } else {
-      window.addEventListener('resize', () => wrappers.forEach(scalePreview));
-    }
-  }
-  initPreviews();
 </script>
 
 </body>
