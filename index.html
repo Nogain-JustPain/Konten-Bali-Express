@@ -64,23 +64,23 @@
   }
   .card.soon .card-thumb svg { width: 26px; height: 26px; color: var(--ink-soft); opacity: .35; }
 
-  /* -- Nama template, di antara foto dan tombol -- */
+  /* -- Overlay "Pakai": muncul pas foto di-hover, nutupin foto item 70% + teks putih di tengah -- */
+  .card-overlay {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(21,20,26,.7); opacity: 0; transition: opacity .22s ease;
+  }
+  a.card:hover .card-overlay { opacity: 1; }
+  .card-overlay span {
+    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500; font-size: 16px;
+    color: #fff; letter-spacing: .01em;
+  }
+
+  /* -- Nama template, di bawah foto -- */
   .card-name {
     text-align: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 12.5px;
     color: var(--ink); line-height: 1.3;
   }
   .card.soon .card-name { color: var(--ink-soft); }
-
-  /* -- "Pakai" itu bagian dari <a> yang sama (bukan link terpisah), biar klik-kanan
-     "open in new tab" tetap jalan di manapun card-nya diklik, bukan cuma di tombolnya -- */
-  .card-cta {
-    display: block; text-align: center;
-    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500; font-size: 13.5px;
-    color: #F4E9D8; background: linear-gradient(155deg, #7A2430, #5C1A22); border-radius: 999px; padding: 9px 0;
-    box-shadow: 0 1px 0 rgba(255,255,255,.06) inset;
-    transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
-  }
-  a.card:hover .card-cta { background: linear-gradient(155deg, #8C2A38, #6B1F28); transform: translateY(-2px); box-shadow: 0 8px 16px rgba(92,26,34,.28); }
 
   .card-cta-soon {
     display: block; text-align: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 11.5px;
@@ -152,12 +152,10 @@
 
     const row = page.templates.map(t => {
       const thumb = t.available
-        ? `<div class="card-thumb"><img src="${t.thumb}" alt="${t.name}" loading="lazy" onerror="this.style.display='none'"></div>`
+        ? `<div class="card-thumb"><img src="${t.thumb}" alt="${t.name}" loading="lazy" onerror="this.style.display='none'"><div class="card-overlay"><span>Pakai</span></div></div>`
         : `<div class="card-thumb">${lockIcon}</div>`;
       const name = `<span class="card-name">${t.name}</span>`;
-      const cta = t.available
-        ? `<span class="card-cta">Pakai</span>`
-        : `<span class="card-cta-soon">Segera Hadir</span>`;
+      const cta = t.available ? '' : `<span class="card-cta-soon">Segera Hadir</span>`;
       const tag = t.available ? 'a' : 'div';
       const hrefAttr = t.available ? ` href="${t.href}"` : '';
       return `<${tag} class="card ${t.available ? 'available' : 'soon'}"${hrefAttr}>${thumb}${name}${cta}</${tag}>`;
