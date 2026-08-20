@@ -43,11 +43,11 @@
   .section-head .rule { flex: 1; max-width: 200px; height: 1px; background: var(--ink); opacity: .3; }
 
   .card-row {
-    display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 20px;
+    display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 32px;
   }
 
-  /* ===== CARD: thumbnail statis (JPEG 1080x1350, contain biar gak kepotong) + tombol Pakai di bawah ===== */
-  a.card, .card { width: 160px; display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: inherit; }
+  /* ===== CARD: thumbnail statis (JPEG 1080x1350, contain biar gak kepotong) + nama + tombol Pakai di bawah ===== */
+  a.card, .card { width: 160px; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit; }
 
   .card-thumb {
     width: 100%; aspect-ratio: 1080/1350; border-radius: 16px; overflow: hidden;
@@ -64,15 +64,23 @@
   }
   .card.soon .card-thumb svg { width: 26px; height: 26px; color: var(--ink-soft); opacity: .35; }
 
+  /* -- Nama template, di antara foto dan tombol -- */
+  .card-name {
+    text-align: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 12.5px;
+    color: var(--ink); line-height: 1.3;
+  }
+  .card.soon .card-name { color: var(--ink-soft); }
+
   /* -- "Pakai" itu bagian dari <a> yang sama (bukan link terpisah), biar klik-kanan
      "open in new tab" tetap jalan di manapun card-nya diklik, bukan cuma di tombolnya -- */
   .card-cta {
     display: block; text-align: center;
     font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500; font-size: 13.5px;
-    color: #fff; background: var(--ink); border-radius: 999px; padding: 9px 0;
-    transition: background .18s ease, transform .18s ease;
+    color: #F4E9D8; background: linear-gradient(155deg, #7A2430, #5C1A22); border-radius: 999px; padding: 9px 0;
+    box-shadow: 0 1px 0 rgba(255,255,255,.06) inset;
+    transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
   }
-  a.card:hover .card-cta { background: #3A3833; transform: translateY(-2px); }
+  a.card:hover .card-cta { background: linear-gradient(155deg, #8C2A38, #6B1F28); transform: translateY(-2px); box-shadow: 0 8px 16px rgba(92,26,34,.28); }
 
   .card-cta-soon {
     display: block; text-align: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 11.5px;
@@ -146,12 +154,13 @@
       const thumb = t.available
         ? `<div class="card-thumb"><img src="${t.thumb}" alt="${t.name}" loading="lazy" onerror="this.style.display='none'"></div>`
         : `<div class="card-thumb">${lockIcon}</div>`;
+      const name = `<span class="card-name">${t.name}</span>`;
       const cta = t.available
         ? `<span class="card-cta">Pakai</span>`
         : `<span class="card-cta-soon">Segera Hadir</span>`;
       const tag = t.available ? 'a' : 'div';
       const hrefAttr = t.available ? ` href="${t.href}"` : '';
-      return `<${tag} class="card ${t.available ? 'available' : 'soon'}"${hrefAttr}>${thumb}${cta}</${tag}>`;
+      return `<${tag} class="card ${t.available ? 'available' : 'soon'}"${hrefAttr}>${thumb}${name}${cta}</${tag}>`;
     }).join('');
 
     section.innerHTML = `
