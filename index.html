@@ -6,109 +6,165 @@
 <title>Generator Konten — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,600;0,700;0,800;1,700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --be-red: #C0181A; --ink: #15141A; --ink-soft: #4A4854; --paper: #FAFAF8; --line: #E5E2DC; --panel: #FFFFFF;
+    --ink: #15141A; --ink-soft: #4A4854; --paper: #FAFAF8; --line: #E5E2DC; --card-dark: #1C1B20;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased;
+  }
 
-  .masthead { border-bottom: 3px solid var(--ink); padding: 28px 40px 22px; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
-  .masthead-brand { display: flex; align-items: center; gap: 12px; }
-  .masthead-mark { width: 40px; height: 40px; border-radius: 8px; background: var(--be-red); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .masthead-mark svg { width: 20px; height: 20px; color: #fff; }
-  .masthead-brand h1 { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 21px; margin: 0; letter-spacing: -.01em; }
-  .masthead-brand span { display: block; font-size: 11.5px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
-  .masthead-date { font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; }
+  .page-title {
+    text-align: center; padding: 56px 24px 8px;
+    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500;
+    font-size: clamp(26px, 3.4vw, 34px); letter-spacing: -.01em;
+  }
+  .page-subtitle {
+    text-align: center; font-size: 13.5px; color: var(--ink-soft); margin: 0 0 54px;
+  }
 
-  .intro { max-width: 1180px; margin: 0 auto; padding: 46px 40px 8px; }
-  .intro-eyebrow { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 12px; color: var(--be-red); text-transform: uppercase; letter-spacing: .1em; margin: 0 0 12px; }
-  .intro h2 { font-family: 'Inter', sans-serif; font-weight: 800; font-size: clamp(28px, 4vw, 40px); line-height: 1.15; letter-spacing: -.015em; margin: 0 0 14px; max-width: 760px; }
-  .intro p { font-size: 15px; line-height: 1.65; color: var(--ink-soft); max-width: 560px; margin: 0; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px 90px; }
 
-  .grid-wrap { max-width: 1180px; margin: 0 auto; padding: 38px 40px 70px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 22px; }
+  .page-section { margin-bottom: 58px; }
+  .page-section:last-child { margin-bottom: 0; }
 
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
-    text-decoration: none; color: inherit; display: flex; flex-direction: column;
-    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
-  .card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(21,20,26,.1); border-color: var(--ink); }
+  .section-head {
+    display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 26px;
+  }
+  .section-head h2 {
+    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500;
+    font-size: 21px; margin: 0; white-space: nowrap;
+  }
+  .section-head .rule { flex: 1; max-width: 220px; height: 1px; background: var(--ink); opacity: .35; }
 
-  .card-thumb { aspect-ratio: 16/10; position: relative; overflow: hidden; display:flex; align-items:center; justify-content:center; border-bottom: 1px solid var(--line); }
-  .card-thumb svg { width: 30px; height: 30px; color: #fff; opacity: .9; }
+  .card-row {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 18px;
+  }
 
-  .card-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-  .card-count { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft); margin-bottom: 2px; }
-  .card-title { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 17px; margin: 0; }
-  .card-desc { font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); margin: 0; }
-  .card-cta { margin-top: 10px; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 12.5px; color: var(--be-red); display: flex; align-items: center; gap: 5px; }
-  .card-cta svg { width: 13px; height: 13px; transition: transform .15s ease; }
-  .card:hover .card-cta svg { transform: translateX(3px); }
+  .card {
+    width: 158px; aspect-ratio: 3/4; border-radius: 22px; overflow: hidden; position: relative;
+    text-decoration: none; display: flex; align-items: flex-end; justify-content: center;
+    background: var(--card-dark); transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .card.available:hover { transform: translateY(-5px); box-shadow: 0 14px 28px rgba(21,20,26,.22); }
+  .card.soon { opacity: .55; cursor: default; }
+
+  .card-label {
+    position: relative; z-index: 2; width: 100%; text-align: center; padding: 16px 10px;
+    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 500; font-size: 13.5px;
+    color: #fff; background: linear-gradient(to top, rgba(0,0,0,.55), transparent);
+  }
+  .card.soon .card-label { color: rgba(255,255,255,.75); }
+
+  .card-preview { position: absolute; inset: 0; overflow: hidden; }
+  .card-preview iframe { position:absolute; top:0; left:0; border:none; transform-origin: top left; pointer-events:none; background:#fff; }
+
+  .card.soon .card-icon {
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    width: 26px; height: 26px; color: rgba(255,255,255,.4);
+  }
 
   @media (max-width: 600px) {
-    .masthead { padding: 22px 20px 18px; }
-    .intro { padding: 34px 20px 6px; }
-    .grid-wrap { padding: 28px 20px 50px; }
+    .page-title { padding: 42px 20px 6px; }
+    .page-subtitle { margin-bottom: 40px; }
+    .card { width: 130px; }
+    .section-head .rule { max-width: 100px; }
   }
 </style>
 </head>
 <body>
 
-  <header class="masthead">
-    <div class="masthead-brand">
-      <div class="masthead-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
-      </div>
-      <div>
-        <h1>Generator Konten</h1>
-        <span>Toolkit Internal — Semua Page</span>
-      </div>
-    </div>
-    <div class="masthead-date" id="todayLabel"></div>
-  </header>
+  <h1 class="page-title">Generator Konten</h1>
+  <p class="page-subtitle">Pilih template untuk mulai bikin konten</p>
 
-  <section class="intro">
-    <p class="intro-eyebrow">Pilih Page</p>
-    <h2>Mau bikin konten buat page yang mana?</h2>
-    <p>Tiap page punya beberapa pilihan template. Klik salah satu page buat lihat template yang tersedia.</p>
-  </section>
-
-  <section class="grid-wrap">
-    <div class="grid" id="pageGrid"></div>
-  </section>
+  <div class="wrap" id="sections"></div>
 
 <script>
+  const BASE_WIDTH = 1280; // assumed natural width of live template pages, for preview scaling
+
   const PAGES = [
-    { name: 'Bali Express', desc: 'Konten highlight & breaking news.', href: 'pages/bali-express/index.html', accent: '#C0181A', count: '1 template tersedia' },
-    { name: 'Info Bali', desc: 'Konten informasi seputar Bali.', href: 'pages/info-bali/index.html', accent: '#1D6FB8', count: 'Segera hadir' },
-    { name: 'Cerita Bali', desc: 'Konten cerita & human interest.', href: 'pages/cerita-bali/index.html', accent: '#B8721D', count: 'Segera hadir' },
-    { name: 'Info BWI', desc: 'Konten informasi seputar Banyuwangi.', href: 'pages/info-bwi/index.html', accent: '#5E3EB8', count: 'Segera hadir' },
+    {
+      name: 'Bali Express',
+      templates: [
+        { name: 'Highlight', href: 'templates/bali-express/highlight/index.html', available: true },
+        { name: 'Template', href: 'templates/bali-express/template-2/index.html', available: false },
+        { name: 'Template', href: 'templates/bali-express/template-3/index.html', available: false },
+        { name: 'Template', href: 'templates/bali-express/template-4/index.html', available: false },
+      ]
+    },
+    {
+      name: 'Info Bali',
+      templates: [
+        { name: 'Template', href: 'templates/info-bali/template-1/index.html', available: false },
+        { name: 'Template', href: 'templates/info-bali/template-2/index.html', available: false },
+        { name: 'Template', href: 'templates/info-bali/template-3/index.html', available: false },
+      ]
+    },
+    {
+      name: 'Cerita Bali',
+      templates: [
+        { name: 'Template', href: 'templates/cerita-bali/template-1/index.html', available: false },
+        { name: 'Template', href: 'templates/cerita-bali/template-2/index.html', available: false },
+        { name: 'Template', href: 'templates/cerita-bali/template-3/index.html', available: false },
+      ]
+    },
+    {
+      name: 'Info BWI',
+      templates: [
+        { name: 'Template', href: 'templates/info-bwi/template-1/index.html', available: false },
+        { name: 'Template', href: 'templates/info-bwi/template-2/index.html', available: false },
+        { name: 'Template', href: 'templates/info-bwi/template-3/index.html', available: false },
+      ]
+    },
   ];
 
-  const grid = document.getElementById('pageGrid');
-  const arrowIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>';
-  const folderIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>';
+  const lockIcon = '<svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
-  PAGES.forEach(p => {
-    const card = document.createElement('a');
-    card.className = 'card';
-    card.href = p.href;
-    card.innerHTML = `
-      <div class="card-thumb" style="background:${p.accent}">${folderIcon}</div>
-      <div class="card-body">
-        <span class="card-count">${p.count}</span>
-        <h3 class="card-title">${p.name}</h3>
-        <p class="card-desc">${p.desc}</p>
-        <span class="card-cta">Lihat template ${arrowIcon}</span>
-      </div>
+  const sectionsEl = document.getElementById('sections');
+
+  PAGES.forEach(page => {
+    const section = document.createElement('div');
+    section.className = 'page-section';
+
+    const row = page.templates.map(t => {
+      const inner = t.available
+        ? `<div class="card-preview"><iframe src="${t.href}" tabindex="-1" scrolling="no"></iframe></div><span class="card-label">${t.name}</span>`
+        : `${lockIcon}<span class="card-label">${t.name}</span>`;
+      return `<a class="card ${t.available ? 'available' : 'soon'}" href="${t.href}">${inner}</a>`;
+    }).join('');
+
+    section.innerHTML = `
+      <div class="section-head"><h2>${page.name}</h2><span class="rule"></span></div>
+      <div class="card-row">${row}</div>
     `;
-    grid.appendChild(card);
+    sectionsEl.appendChild(section);
   });
 
-  document.getElementById('todayLabel').textContent = new Date().toLocaleDateString('id-ID', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-  });
+  // Scale every live iframe preview to fit its card, and keep it correct on resize.
+  function scalePreview(wrapper) {
+    const iframe = wrapper.querySelector('iframe');
+    if (!iframe) return;
+    const w = wrapper.clientWidth, h = wrapper.clientHeight;
+    if (!w || !h) return;
+    const scale = w / BASE_WIDTH;
+    iframe.style.width = BASE_WIDTH + 'px';
+    iframe.style.height = (h / scale) + 'px';
+    iframe.style.transform = `scale(${scale})`;
+  }
+  function initPreviews() {
+    const wrappers = document.querySelectorAll('.card-preview');
+    wrappers.forEach(scalePreview);
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(entries => entries.forEach(e => scalePreview(e.target)));
+      wrappers.forEach(w => ro.observe(w));
+    } else {
+      window.addEventListener('resize', () => wrappers.forEach(scalePreview));
+    }
+  }
+  initPreviews();
 </script>
 
 </body>
