@@ -769,6 +769,11 @@ function render() {
   ctx.fillStyle = CREDIT_TEXT_COLOR;
   const creditRaw = creditInput.value.trim();
   ctx.fillText(`Foto : ${creditRaw}`, L.textLeft, L.creditTop + CREDIT_SIZE * 0.72);
+
+  // "baliexpress.id" — sejajar dengan kredit foto, rata kanan di pojok kanan bawah
+  ctx.textAlign = 'right';
+  ctx.fillText('baliexpress.id', CANVAS_W - TEXT_SIDE_MARGIN, L.creditTop + CREDIT_SIZE * 0.72);
+  ctx.textAlign = 'left';
 }
 
 // ===== EVENTS =====
