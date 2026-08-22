@@ -1158,6 +1158,18 @@ function render() {
     }
   }
 
+  function drawPhotoCredit(py) {
+    // Kredit foto di pojok kanan atas area foto, style italic biar beda dari brand text di blok bawah
+    const inset = 56;
+    const creditFontSize = 26;
+    const photoCreditVal = (photoCreditInput.value.trim() || 'Ist');
+    ctx.font = `italic 400 ${creditFontSize}px Poppins, Arial, sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.textAlign = 'right';
+    ctx.fillText(`Foto: ${photoCreditVal}`, CANVAS_W - inset, py + inset + creditFontSize);
+    ctx.textAlign = 'left';
+  }
+
   function drawHeadlineBlock(by, blockHeight) {
     ctx.fillStyle = INK;
     ctx.fillRect(0, by, CANVAS_W, blockHeight);
@@ -1197,18 +1209,18 @@ function render() {
     ctx.textAlign = 'left';
     ctx.fillText('koranbaliexpress', brandTextX, rowY);
 
-    // -- Sisi kanan: kredit foto
-    const photoCreditVal = (photoCreditInput.value.trim() || 'Ist');
+    // -- Sisi kanan: baliexpress.id (kredit foto dipindah ke pojok kanan atas foto)
     ctx.font = `400 26px Poppins, Arial, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.45)';
     ctx.textAlign = 'right';
-    ctx.fillText(`Foto: ${photoCreditVal}`, CANVAS_W - padX, rowY);
+    ctx.fillText('baliexpress.id', CANVAS_W - padX, rowY);
     ctx.textAlign = 'left';
   }
 
   if (blockPosition === 'bottom') {
     drawPhoto(photoY, photoH);
     drawLogo(photoY);
+    drawPhotoCredit(photoY);
 
     // thin red separator line between photo and block
     ctx.fillStyle = RED;
@@ -1225,6 +1237,7 @@ function render() {
 
     drawPhoto(photoY, photoH);
     drawLogo(photoY);
+    drawPhotoCredit(photoY);
   }
 }
 
