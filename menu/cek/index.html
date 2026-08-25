@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cek Kata Sensitif - Redaksi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #faf9f6;
+    --card: #ffffff;
+    --border: #e8e5df;
+    --text: #2a2a2a;
+    --muted: #8b8680;
+    --accent: #c9a961;
+    --danger: #d64545;
+    --danger-bg: #fdecec;
+    --safe: #3a8a5c;
+    --safe-bg: #eaf6ef;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    padding: 48px 16px;
+    min-height: 100vh;
+  }
+  .wrap { width: 100%; max-width: 640px; }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 36px;
+    margin: 0 0 8px;
+    text-align: center;
+    color: #1a1a1a;
+  }
+  p.sub {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+    margin: 0 0 32px;
+    text-align: center;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+  }
+  label {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: #4a4a4a;
+    display: block;
+    margin-bottom: 10px;
+  }
+  textarea:focus { outline: 1px solid var(--accent); }
+  .editor-wrap {
+    position: relative;
+    width: 100%;
+  }
+  .editor-wrap textarea,
+  .highlight-layer {
+    width: 100%;
+    min-height: 180px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 300;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.7;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  .editor-wrap textarea {
+    position: relative;
+    background: transparent;
+    color: var(--text);
+    resize: vertical;
+    caret-color: var(--text);
+    z-index: 2;
+  }
+  .highlight-layer {
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 1;
+    background: #fcfbf9;
+    color: transparent;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .highlight-layer mark {
+    background: #f5cf47;
+    color: transparent;
+    border-radius: 3px;
+    padding: 0;
+  }
+  .row { display: flex; gap: 8px; margin-top: 14px; }
+  button {
+    background: #1a1a1a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 20px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    flex: 1;
+    letter-spacing: 0.3px;
+  }
+  button:hover { background: #333; }
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    flex: none;
+  }
+  button.secondary:hover { background: #f5f3ef; }
+  #status {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 400;
+    white-space: pre-wrap;
+  }
+  #status.safe { background: var(--safe-bg); border: 1px solid #bfe3cd; color: var(--safe); }
+  #status.danger { background: var(--danger-bg); border: 1px solid #f2c1c1; color: var(--danger); }
+  #status.idle { background: #f5f3ef; border: 1px solid var(--border); color: var(--muted); }
+  details { margin-top: 16px; }
+  summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 400;
+  }
+  .wordlist { font-size: 12px; color: var(--muted); line-height: 1.9; margin-top: 10px; font-weight: 300; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Cek Kata Sensitif</h1>
+  <p class="sub">Redaksi · draft naskah dicek otomatis sesuai pedoman peliputan</p>
+
+  <div class="card">
+    <label for="postText">Draft naskah</label>
+    <div class="editor-wrap">
+      <div id="highlightLayer" class="highlight-layer" aria-hidden="true"></div>
+      <textarea id="postText" placeholder="Tulis atau paste draft naskah di sini..." spellcheck="false"></textarea>
+    </div>
+    <div class="row">
+      <button class="secondary" onclick="clearAll()">Bersihkan</button>
+    </div>
+    <div id="status" class="idle">Belum ada teks yang dicek.</div>
+  </div>
+
+  <details>
+    <summary>Lihat daftar kata yang dideteksi (klik untuk buka)</summary>
+    <div class="wordlist" id="wordlistDisplay"></div>
+  </details>
+</div>
+
+<script>
+// Daftar kata sensitif (sudah dirapikan & digabung, tanpa duplikat)
+const KEYWORDS = [
+  "bunuh diri", "mengakhiri hidup", "mengakhiri nyawa", "gantung diri",
+  "melompat dari ketinggian", "terjun dari gedung", "terjun dari jembatan",
+  "menceburkan diri", "menenggelamkan diri", "menabrakkan diri ke kereta",
+  "menabrakkan diri ke kendaraan", "menyayat pergelangan",
+  "melukai diri dengan senjata tajam", "meminum racun", "menelan racun",
+  "menenggak zat beracun", "overdosis", "minum racun", "menenggak racun",
+  "tergantung", "membakar diri",
+  "mengikat diri di rel", "melompat ke jalur kereta",
+  "menjatuhkan diri ke jurang", "menceburkan diri ke laut",
+  "menceburkan diri ke sungai", "menenggelamkan diri di kolam",
+  "menghirup gas beracun", "menyuntikkan zat berbahaya",
+  "membekap diri hingga kehabisan napas", "melompat", "terjun",
+  "menjatuhkan diri", "menabrakkan diri", "meracuni diri",
+  "meracuni diri sendiri", "menyayat diri", "melukai diri",
+  "mencederai diri", "menyakiti diri", "melukai tubuh sendiri",
+  "menyakiti tubuh sendiri", "mutilasi diri", "percobaan mengakhiri hidup",
+  "tindakan mengakhiri hidup", "self-harm", "self harm", "self-injury",
+  "self injury", "self-injurious", "self-inflicted injury",
+  "menyakiti diri sendiri", "melukai diri sendiri", "mencederai diri sendiri",
+  "menyiksa diri", "menyakiti tubuh", "melukai tubuh", "mencederai tubuh",
+  "menyayat tubuh", "menyayat kulit", "melukai anggota tubuh",
+  "tindakan menyakiti tubuh", "cedera yang dilakukan sendiri",
+  "luka yang dibuat sendiri", "ulah pati", "aborsi",
+  // Tambahan seputar bunuh diri & self-harm
+  "ingin mati", "pengen mati", "capek hidup", "lelah hidup",
+  "ga pengen hidup lagi", "tidak ingin hidup lagi", "mengakhiri segalanya",
+  "surat wasiat", "pesan terakhir", "cara mengakhiri hidup",
+  "metode bunuh diri", "cara bunuh diri", "self-harm scars",
+  "bekas sayatan", "self-mutilation", "melukai pergelangan tangan",
+  "cutting", "self-cutting",
+  // Gangguan pola makan (sesuai kategori kebijakan Meta: pro-eating disorder)
+  "anoreksia", "anorexia", "bulimia", "pro-ana", "proana", "pro-mia", "promia",
+  "thinspo", "thinspiration", "meanspo", "bonespo", "fitspo ekstrem",
+  "diet ekstrem", "kelaparan diri", "starvation diet", "puasa ekstrem",
+  "purging", "memuntahkan makanan", "mencuci perut", "binge and purge",
+  "cara cepat kurus", "target berat badan ekstrem", "kalori nol",
+  "menahan lapar berlebihan", "obsesi berat badan", "body check ekstrem"
+];
+
+// Hilangkan duplikat, urutkan dari yang terpanjang biar deteksi frasa lebih akurat
+const UNIQUE_KEYWORDS = [...new Set(KEYWORDS.map(k => k.toLowerCase()))]
+  .sort((a, b) => b.length - a.length);
+
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function renderWordlist() {
+  const el = document.getElementById('wordlistDisplay');
+  el.textContent = UNIQUE_KEYWORDS.join(', ');
+}
+
+function buildHighlightPattern() {
+  // Gabungkan semua kata jadi satu regex, kata terpanjang duluan biar frasa kepilih lebih dulu dari kata pendek
+  const parts = UNIQUE_KEYWORDS.map(escapeRegex);
+  return new RegExp('\\b(' + parts.join('|') + ')\\b', 'gi');
+}
+const HIGHLIGHT_PATTERN = buildHighlightPattern();
+
+function syncHighlightLayer() {
+  const textarea = document.getElementById('postText');
+  const layer = document.getElementById('highlightLayer');
+  const text = textarea.value;
+
+  const escaped = escapeHtml(text);
+  const highlighted = escaped.replace(HIGHLIGHT_PATTERN, '<mark>$1</mark>');
+
+  // Tambah newline ekstra biar tinggi layer selalu >= textarea (mencegah potong baris terakhir)
+  layer.innerHTML = highlighted + '\n';
+}
+
+function syncScroll() {
+  const textarea = document.getElementById('postText');
+  const layer = document.getElementById('highlightLayer');
+  layer.scrollTop = textarea.scrollTop;
+  layer.scrollLeft = textarea.scrollLeft;
+}
+
+function checkText() {
+  const text = document.getElementById('postText').value;
+  const statusBox = document.getElementById('status');
+
+  syncHighlightLayer();
+  syncScroll();
+
+  if (text.trim().length === 0) {
+    statusBox.className = 'idle';
+    statusBox.textContent = 'Belum ada teks yang dicek.';
+    return;
+  }
+
+  let found = [];
+  UNIQUE_KEYWORDS.forEach(kw => {
+    const pattern = new RegExp('\\b' + escapeRegex(kw) + '\\b', 'i');
+    if (pattern.test(text)) found.push(kw);
+  });
+
+  if (found.length > 0) {
+    statusBox.className = 'danger';
+    statusBox.textContent = '⚠️ Ketemu ' + found.length + ' kata sensitif: ' + found.join(', ');
+  } else {
+    statusBox.className = 'safe';
+    statusBox.textContent = '✅ Aman, tidak ada kata sensitif terdeteksi.';
+  }
+}
+
+function clearAll() {
+  document.getElementById('postText').value = '';
+  document.getElementById('highlightLayer').innerHTML = '';
+  const statusBox = document.getElementById('status');
+  statusBox.className = 'idle';
+  statusBox.textContent = 'Belum ada teks yang dicek.';
+}
+
+const postTextEl = document.getElementById('postText');
+postTextEl.addEventListener('input', checkText);
+postTextEl.addEventListener('scroll', syncScroll);
+renderWordlist();
+</script>
+</body>
+</html>
