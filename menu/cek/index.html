@@ -63,46 +63,50 @@
     display: block;
     margin-bottom: 10px;
   }
-  textarea:focus { outline: 1px solid var(--accent); }
+  textarea:focus { outline: none; }
   .editor-wrap {
     position: relative;
     width: 100%;
-    height: 220px;
+    max-height: 260px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fcfbf9;
   }
+  .editor-wrap:focus-within { border-color: var(--accent); }
   .editor-wrap textarea,
   .highlight-layer {
     width: 100%;
-    height: 100%;
     padding: 14px;
     font-size: 15px;
     font-weight: 300;
     font-family: 'Poppins', sans-serif;
     line-height: 1.7;
-    border: 1px solid var(--border);
-    border-radius: 10px;
     box-sizing: border-box;
     white-space: pre-wrap;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    border: none;
+    margin: 0;
+    display: block;
   }
   .editor-wrap textarea {
-    position: absolute;
-    top: 0; left: 0;
+    position: relative;
     background: transparent;
     color: var(--text);
-    resize: vertical;
+    resize: none;
+    overflow: hidden;
     caret-color: var(--text);
     z-index: 2;
-    overflow-y: auto;
+    min-height: 180px;
   }
   .highlight-layer {
     position: absolute;
     top: 0; left: 0;
     z-index: 1;
-    background: #fcfbf9;
     color: transparent;
     pointer-events: none;
-    overflow: hidden;
+    min-height: 180px;
   }
   .highlight-layer mark {
     background: #f5cf47;
@@ -254,11 +258,14 @@ function syncHighlightLayer() {
   layer.innerHTML = highlighted + '\n';
 }
 
-function syncScroll() {
+function autoGrow() {
   const textarea = document.getElementById('postText');
   const layer = document.getElementById('highlightLayer');
-  layer.scrollTop = textarea.scrollTop;
-  layer.scrollLeft = textarea.scrollLeft;
+  // Reset dulu biar scrollHeight kehitung ulang dari nol, bukan numpuk dari tinggi lama
+  textarea.style.height = 'auto';
+  const newHeight = textarea.scrollHeight + 'px';
+  textarea.style.height = newHeight;
+  layer.style.height = newHeight;
 }
 
 function checkText() {
@@ -266,7 +273,7 @@ function checkText() {
   const statusBox = document.getElementById('status');
 
   syncHighlightLayer();
-  syncScroll();
+  autoGrow();
 
   if (text.trim().length === 0) {
     statusBox.className = 'idle';
@@ -290,8 +297,11 @@ function checkText() {
 }
 
 function clearAll() {
-  document.getElementById('postText').value = '';
+  const textarea = document.getElementById('postText');
+  textarea.value = '';
   document.getElementById('highlightLayer').innerHTML = '';
+  textarea.style.height = '';
+  document.getElementById('highlightLayer').style.height = '';
   const statusBox = document.getElementById('status');
   statusBox.className = 'idle';
   statusBox.textContent = 'Belum ada teks yang dicek.';
@@ -299,16 +309,8 @@ function clearAll() {
 
 const postTextEl = document.getElementById('postText');
 postTextEl.addEventListener('input', checkText);
-postTextEl.addEventListener('scroll', syncScroll);
-
-// Sinkronkan tinggi wrapper kalau textarea di-resize manual (drag pojok kanan-bawah)
-const editorWrap = document.querySelector('.editor-wrap');
-const resizeObserver = new ResizeObserver(() => {
-  editorWrap.style.height = postTextEl.offsetHeight + 'px';
-  syncScroll();
-});
-resizeObserver.observe(postTextEl);
 renderWordlist();
+autoGrow();
 </script>
 </body>
 </html>
