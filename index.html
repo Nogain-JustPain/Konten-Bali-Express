@@ -17,9 +17,37 @@
     font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased;
   }
 
+  /* ===== TOP HEADER: logo/nama kiri, nav kanan ===== */
+  .top-header {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--card-bg); border-bottom: 1px solid var(--line);
+    padding: 20px 48px;
+  }
+  .top-header .brand-wrap {
+    max-width: 960px; margin: 0 auto; width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .top-header .brand {
+    font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400;
+    font-size: 19px; color: var(--ink-soft); text-decoration: none;
+  }
+  .top-header nav a {
+    font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 13px;
+    color: var(--ink-soft); text-decoration: none; padding: 9px 20px;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--paper);
+    transition: all .18s ease;
+  }
+  .top-header nav a:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+  @media (max-width: 600px) {
+    .top-header { padding: 16px 20px; }
+    .top-header .brand { font-size: 16px; }
+    .top-header nav a { font-size: 12px; padding: 7px 15px; }
+  }
+
   /* ===== HEADER: big elegant title, subtitle mepet di bawahnya ===== */
   .page-title {
-    text-align: center; margin: 0; padding: 64px 24px 0;
+    text-align: center; margin: 0; padding: 40px 24px 0;
     font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400;
     font-size: clamp(38px, 5.4vw, 54px); letter-spacing: -.01em; line-height: 1.1;
   }
@@ -88,7 +116,7 @@
   }
 
   @media (max-width: 600px) {
-    .page-title { padding: 48px 20px 0; }
+    .page-title { padding: 32px 20px 0; }
     .page-subtitle { margin: 6px 0 42px; }
     .card { width: 150px; }
     .section-head .rule { max-width: 90px; }
@@ -96,6 +124,13 @@
 </style>
 </head>
 <body>
+
+  <header class="top-header">
+    <div class="brand-wrap">
+      <span class="brand">Bali Express</span>
+      <nav><a href="/menu/cek/index.html">Cek Caption</a></nav>
+    </div>
+  </header>
 
   <h1 class="page-title">Generator Konten</h1>
   <p class="page-subtitle">Pilih template untuk mulai bikin konten</p>
