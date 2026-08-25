@@ -67,11 +67,12 @@
   .editor-wrap {
     position: relative;
     width: 100%;
+    height: 220px;
   }
   .editor-wrap textarea,
   .highlight-layer {
     width: 100%;
-    min-height: 180px;
+    height: 100%;
     padding: 14px;
     font-size: 15px;
     font-weight: 300;
@@ -85,12 +86,14 @@
     overflow-wrap: break-word;
   }
   .editor-wrap textarea {
-    position: relative;
+    position: absolute;
+    top: 0; left: 0;
     background: transparent;
     color: var(--text);
     resize: vertical;
     caret-color: var(--text);
     z-index: 2;
+    overflow-y: auto;
   }
   .highlight-layer {
     position: absolute;
@@ -297,6 +300,14 @@ function clearAll() {
 const postTextEl = document.getElementById('postText');
 postTextEl.addEventListener('input', checkText);
 postTextEl.addEventListener('scroll', syncScroll);
+
+// Sinkronkan tinggi wrapper kalau textarea di-resize manual (drag pojok kanan-bawah)
+const editorWrap = document.querySelector('.editor-wrap');
+const resizeObserver = new ResizeObserver(() => {
+  editorWrap.style.height = postTextEl.offsetHeight + 'px';
+  syncScroll();
+});
+resizeObserver.observe(postTextEl);
 renderWordlist();
 </script>
 </body>
