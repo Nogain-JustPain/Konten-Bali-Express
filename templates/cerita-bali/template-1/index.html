@@ -936,10 +936,44 @@ function render() {
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
   }
 
+  // ---- HEADER: kredit foto (kiri atas, italic, putih+shadow) & "Cerita Bali" (kanan atas) ----
+  const headerInset = 48;
+  const headerBaselineY = 66;
+  const creditFontSize = 20;
+  const ceritaBaliFontSize = 36;
+
+  // -- Kiri atas: kredit foto (italic, putih dengan shadow biar menonjol dari foto)
+  const creditTextTop = creditInput.value.trim();
+  if (creditTextTop) {
+    ctx.font = `italic 300 ${creditFontSize}px Poppins, Arial, sans-serif`;
+    ctx.textAlign = 'left';
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 2;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(`Foto: ${creditTextTop}`, headerInset, headerBaselineY);
+    ctx.restore();
+  }
+
+  // -- Kanan atas: "Cerita Bali"
+  ctx.font = `italic 500 ${ceritaBaliFontSize}px "Playfair Display", Georgia, serif`;
+  ctx.textAlign = 'right';
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 2;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText('Cerita Bali', CANVAS_W - headerInset, headerBaselineY);
+  ctx.restore();
+  ctx.textAlign = 'left';
+
   // ---- JUDUL: hitung dulu ukuran teks buat nentuin tinggi panel hijau ----
   const headline = headlineInput.value.trim() || 'Judul headline berita akan tampil di sini';
   const padX = 76;
-  const fontSize = 64;
+  const fontSize = 54;
   const lineHeight = fontSize * 1.55; // dilebarkan sedikit biar antar baris judul tidak terlalu mepet
   const maxTextWidth = CANVAS_W - padX * 2;
 
@@ -958,19 +992,14 @@ function render() {
 
   const textBlockH = shownLines.length * lineHeight;
   const topPad = 156;   // jarak dari lekukan panel ke baris teks pertama
-  const bottomPad = 138; // jarak dari baris teks terakhir ke garis dasar bawah panel hijau
-  const whiteBarH = 132;  // tinggi strip putih di paling bawah (dilebarin lagi biar label punya padding bawah)
-  const greenFlatBottomY = CANVAS_H - whiteBarH;
+  const bottomPad = 64;  // jarak dari baris teks terakhir ke tepi bawah kanvas (strip putih & padding lama dihapus)
+  const greenFlatBottomY = CANVAS_H; // panel sekarang rata sampai tepi bawah kanvas, gak ada strip putih lagi
   const panelBaseY = greenFlatBottomY - (topPad + textBlockH + bottomPad);
 
-  // ---- PANEL HIJAU: lekukan runcing (V) di kiri-atas (diisi putih) + "lidah" runcing di kanan-bawah ----
+  // ---- PANEL HIJAU: lekukan runcing (V) di kiri-atas (diisi putih), rata di bawah ----
   const topNotchCenterX = CANVAS_W * 0.30;
   const topNotchHalfW = CANVAS_W * 0.145;
   const topNotchDepth = 100;
-
-  const tongueCenterX = CANVAS_W * 0.705;
-  const tongueHalfW = CANVAS_W * 0.115;
-  const tongueDepth = 62;
 
   ctx.beginPath();
   ctx.moveTo(0, panelBaseY);
@@ -985,40 +1014,12 @@ function render() {
   );
   ctx.lineTo(CANVAS_W, panelBaseY);
   ctx.lineTo(CANVAS_W, greenFlatBottomY);
-  ctx.lineTo(tongueCenterX + tongueHalfW, greenFlatBottomY);
-  ctx.quadraticCurveTo(
-    tongueCenterX + tongueHalfW * 0.08, greenFlatBottomY,
-    tongueCenterX, greenFlatBottomY + tongueDepth
-  );
-  ctx.quadraticCurveTo(
-    tongueCenterX - tongueHalfW * 0.08, greenFlatBottomY,
-    tongueCenterX - tongueHalfW, greenFlatBottomY
-  );
   ctx.lineTo(0, greenFlatBottomY);
   ctx.closePath();
   ctx.fillStyle = RED; // variabel RED sekarang berisi warna hijau brand
   ctx.fill();
 
   // ---- LEKUKAN ATAS dibiarin kosong (foto keliatan di baliknya, gak diisi putih) ----
-
-  // ---- STRIP PUTIH di paling bawah, lekukannya "ngunci" pas sama lidah hijau di atasnya ----
-  ctx.beginPath();
-  ctx.moveTo(0, greenFlatBottomY);
-  ctx.lineTo(tongueCenterX - tongueHalfW, greenFlatBottomY);
-  ctx.quadraticCurveTo(
-    tongueCenterX - tongueHalfW * 0.08, greenFlatBottomY,
-    tongueCenterX, greenFlatBottomY + tongueDepth
-  );
-  ctx.quadraticCurveTo(
-    tongueCenterX + tongueHalfW * 0.08, greenFlatBottomY,
-    tongueCenterX + tongueHalfW, greenFlatBottomY
-  );
-  ctx.lineTo(CANVAS_W, greenFlatBottomY);
-  ctx.lineTo(CANVAS_W, CANVAS_H);
-  ctx.lineTo(0, CANVAS_H);
-  ctx.closePath();
-  ctx.fillStyle = PANEL_LIGHT;
-  ctx.fill();
 
   // ---- TEKS JUDUL putih di atas panel biru gelap ----
   ctx.font = `600 ${fontSize}px Inter, Arial, sans-serif`;
@@ -1029,26 +1030,6 @@ function render() {
     const baseline = panelBaseY + topPad + i * lineHeight + fontSize * 0.82;
     ctx.fillText(line, padX, baseline);
   });
-
-  // ---- LABEL "Cerita Bali" (kanan) + kredit foto (kiri), di atas strip putih paling bawah ----
-  // Ditaruh di pita bawah strip yang gak kena lekukan "lidah" navy, dengan padding bawah
-  // biar teksnya gak terlalu mepet ke tepi bawah gambar.
-  const labelBottomPad = 46;
-  const whiteSafeCenterY = CANVAS_H - labelBottomPad;
-  ctx.textBaseline = 'middle';
-
-  ctx.textAlign = 'right';
-  ctx.font = 'italic 500 30px "Playfair Display", Georgia, serif';
-  ctx.fillStyle = RED;
-  ctx.fillText('Cerita Bali', CANVAS_W - padX, whiteSafeCenterY);
-
-  const creditText = creditInput.value.trim();
-  if (creditText) {
-    ctx.textAlign = 'left';
-    ctx.font = 'italic 300 20px Poppins, Arial, sans-serif';
-    ctx.fillStyle = RED;
-    ctx.fillText(`Foto: ${creditText}`, padX, whiteSafeCenterY);
-  }
 
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left';
