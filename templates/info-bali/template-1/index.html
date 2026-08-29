@@ -398,8 +398,8 @@ const ICON_IG_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemSAAAABmJLR0QA/wD
 // ===== KONFIGURASI =====
 const CANVAS_W = 1080;
 const CANVAS_H = 1350;
-const RED = '#181818';
-const WHITE = '#FFFFFF';
+const HIGHLIGHT_BG = '#FFFFFF';
+const HEADLINE_TEXT = '#000000';
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -925,7 +925,7 @@ function render() {
     { pos: 0.85, a: 0.68 },
     { pos: 1,    a: 0.82 },
   ];
-  gradStops.forEach((s) => grad.addColorStop(s.pos, `rgba(0,78,61,${s.a})`));
+  gradStops.forEach((s) => grad.addColorStop(s.pos, `rgba(100,0,0,${s.a})`));
   ctx.fillStyle = grad;
   ctx.fillRect(0, CANVAS_H - gradH, CANVAS_W, gradH);
 
@@ -947,15 +947,15 @@ function render() {
     const smoothstep = (x) => x * x * (3 - 2 * x);
 
     const extraGrad = ctx.createLinearGradient(0, 0, 0, CANVAS_H);
-    extraGrad.addColorStop(0, 'rgba(0,0,0,0)');
-    extraGrad.addColorStop(transparentPoint, 'rgba(0,0,0,0)');
+    extraGrad.addColorStop(0, 'rgba(100,0,0,0)');
+    extraGrad.addColorStop(transparentPoint, 'rgba(100,0,0,0)');
     [0.25, 0.5, 0.75].forEach((s) => {
       const pos = transparentPoint + (fullBlackPoint - transparentPoint) * s;
       const a = fixedAlpha * smoothstep(s);
-      extraGrad.addColorStop(pos, `rgba(0,0,0,${a.toFixed(3)})`);
+      extraGrad.addColorStop(pos, `rgba(100,0,0,${a.toFixed(3)})`);
     });
-    extraGrad.addColorStop(fullBlackPoint, `rgba(0,0,0,${fixedAlpha})`);
-    extraGrad.addColorStop(1, `rgba(0,0,0,${fixedAlpha})`);
+    extraGrad.addColorStop(fullBlackPoint, `rgba(100,0,0,${fixedAlpha})`);
+    extraGrad.addColorStop(1, `rgba(100,0,0,${fixedAlpha})`);
     ctx.fillStyle = extraGrad;
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
   }
@@ -1007,10 +1007,10 @@ function render() {
     const boxX = (CANVAS_W - boxW) / 2;
     const boxH = rowH;
 
-    ctx.fillStyle = RED;
+    ctx.fillStyle = HIGHLIGHT_BG;
     ctx.fillRect(boxX, boxY, boxW, boxH);
 
-    ctx.fillStyle = WHITE;
+    ctx.fillStyle = HEADLINE_TEXT;
     ctx.fillText(line, CANVAS_W / 2, boxY + bgPadY + fontSize - 4);
   });
   ctx.textAlign = 'left';
