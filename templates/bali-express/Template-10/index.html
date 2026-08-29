@@ -709,7 +709,7 @@ function computeLayout() {
   const headline = headlineInput.value.trim() || 'Judul headline berita akan tampil di sini';
   const padX = 72;
   const maxTextWidth = CANVAS_W - padX * 2;
-  const fontSize = 64;
+  const fontSize = 60;
   const lineHeight = 94;
 
   ctx.font = `700 ${fontSize}px Inter, Arial, sans-serif`;
@@ -728,7 +728,7 @@ function computeLayout() {
   // lalu foto (shape abstrak) mengisi sisa ruang sampai bawah kanvas.
   const logoY = 48;
   const logoAreaH = 100; // ruang cadangan buat tinggi logo
-  const titleTopGap = 0;
+  const titleTopGap = 20;
   const titleY = logoY + logoAreaH + titleTopGap;
   const gapBeforePhoto = 96;
   const bottomMargin = 0; // foto mepet penuh sampai tepi bawah kanvas, icon sosmed & brand nempel di atasnya
