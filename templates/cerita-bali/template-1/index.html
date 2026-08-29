@@ -6,7 +6,7 @@
 <title>Generator Konten</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Poppins:wght@300;400&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Poppins:ital,wght@0,300;0,400;1,300&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
 <style>
   :root {
     --be-red: #1B3A6B;
@@ -311,6 +311,11 @@
       <div class="char-count" id="gradientIntensityLabel">Jangkauan: 0%</div>
     </div>
 
+    <div class="field">
+      <label for="creditInput">Kredit Foto</label>
+      <input type="text" id="creditInput" placeholder="cth: Instagram @namaakun" maxlength="60" value="-" style="width:100%; border:1.5px solid var(--line); border-radius:6px; padding:11px 13px; font-size:14px; font-family:inherit; color:var(--ink); background:var(--paper);">
+    </div>
+
     <button class="download-btn" id="downloadBtn" disabled>⬇ Download JPG</button>
     <div class="status-msg" id="statusMsg">Upload foto dulu buat mulai</div>
   </div>
@@ -417,6 +422,10 @@ gradientIntensity.addEventListener('input', () => {
   gradientIntensityLabel.textContent = `Jangkauan: ${extraGradientIntensity}%`;
   render();
 });
+
+// ===== KREDIT FOTO =====
+const creditInput = document.getElementById('creditInput');
+creditInput.addEventListener('input', () => render());
 
 // ===== HELPERS =====
 // Wraps text to fit maxWidth, AND respects manual line breaks (Enter key in the textarea).
@@ -930,11 +939,11 @@ function render() {
   // ---- JUDUL: hitung dulu ukuran teks buat nentuin tinggi panel hijau ----
   const headline = headlineInput.value.trim() || 'Judul headline berita akan tampil di sini';
   const padX = 76;
-  const fontSize = 46;
-  const lineHeight = fontSize * 1.45; // dilebarkan sedikit biar antar baris judul tidak terlalu mepet
+  const fontSize = 64;
+  const lineHeight = fontSize * 1.55; // dilebarkan sedikit biar antar baris judul tidak terlalu mepet
   const maxTextWidth = CANVAS_W - padX * 2;
 
-  ctx.font = `800 ${fontSize}px Inter, Arial, sans-serif`;
+  ctx.font = `600 ${fontSize}px Inter, Arial, sans-serif`;
   ctx.textAlign = 'left';
   const lines = wrapText(ctx, headline, maxTextWidth);
   const maxLines = 5;
@@ -950,7 +959,7 @@ function render() {
   const textBlockH = shownLines.length * lineHeight;
   const topPad = 156;   // jarak dari lekukan panel ke baris teks pertama
   const bottomPad = 138; // jarak dari baris teks terakhir ke garis dasar bawah panel hijau
-  const whiteBarH = 92;  // tinggi strip putih di paling bawah
+  const whiteBarH = 132;  // tinggi strip putih di paling bawah (dilebarin lagi biar label punya padding bawah)
   const greenFlatBottomY = CANVAS_H - whiteBarH;
   const panelBaseY = greenFlatBottomY - (topPad + textBlockH + bottomPad);
 
@@ -1012,7 +1021,7 @@ function render() {
   ctx.fill();
 
   // ---- TEKS JUDUL putih di atas panel biru gelap ----
-  ctx.font = `800 ${fontSize}px Inter, Arial, sans-serif`;
+  ctx.font = `600 ${fontSize}px Inter, Arial, sans-serif`;
   ctx.fillStyle = WHITE;
   ctx.textAlign = 'left';
   shownLines.forEach((line, i) => {
@@ -1020,6 +1029,29 @@ function render() {
     const baseline = panelBaseY + topPad + i * lineHeight + fontSize * 0.82;
     ctx.fillText(line, padX, baseline);
   });
+
+  // ---- LABEL "Cerita Bali" (kanan) + kredit foto (kiri), di atas strip putih paling bawah ----
+  // Ditaruh di pita bawah strip yang gak kena lekukan "lidah" navy, dengan padding bawah
+  // biar teksnya gak terlalu mepet ke tepi bawah gambar.
+  const labelBottomPad = 46;
+  const whiteSafeCenterY = CANVAS_H - labelBottomPad;
+  ctx.textBaseline = 'middle';
+
+  ctx.textAlign = 'right';
+  ctx.font = 'italic 500 30px "Playfair Display", Georgia, serif';
+  ctx.fillStyle = RED;
+  ctx.fillText('Cerita Bali', CANVAS_W - padX, whiteSafeCenterY);
+
+  const creditText = creditInput.value.trim();
+  if (creditText) {
+    ctx.textAlign = 'left';
+    ctx.font = 'italic 300 20px Poppins, Arial, sans-serif';
+    ctx.fillStyle = RED;
+    ctx.fillText(`Foto: ${creditText}`, padX, whiteSafeCenterY);
+  }
+
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left';
 }
 
 // ===== EVENT HANDLERS =====
@@ -1339,8 +1371,9 @@ function hideLoadingScreen() {
 function waitForFont() {
   if (document.fonts && document.fonts.load) {
     return Promise.all([
-      document.fonts.load('700 48px Inter'),
-      document.fonts.load('300 26px Poppins')
+      document.fonts.load('600 64px Inter'),
+      document.fonts.load('italic 300 22px Poppins'),
+      document.fonts.load('italic 500 32px "Playfair Display"')
     ]).catch(() => {}).then(() => document.fonts.ready);
   }
   return Promise.resolve();
