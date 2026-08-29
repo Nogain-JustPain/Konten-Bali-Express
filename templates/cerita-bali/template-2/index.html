@@ -3,35 +3,1259 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Segera Hadir — Generator Konten</title>
+<title>Generator Konten</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Poppins:ital,wght@0,300;0,400;1,300&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
 <style>
-  :root { --ink:#15141A; --ink-soft:#4A4854; --paper:#FAFAF8; --line:#E5E2DC; }
-  * { box-sizing:border-box; }
-  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-    background:var(--paper); font-family:'Poppins', sans-serif; color:var(--ink); text-align:center; padding:24px; }
-  .wrap { max-width:420px; }
-  .badge { display:inline-block; background:#FBE9C6; color:#8A5A00; font-family:'Poppins',sans-serif; font-weight:600;
-    font-size:11px; letter-spacing:.05em; text-transform:uppercase; padding:6px 14px; border-radius:999px; margin-bottom:18px; }
-  h1 { font-family:'Playfair Display', serif; font-style:italic; font-weight:500; font-size:26px; margin:0 0 10px; }
-  p { font-size:14px; color:var(--ink-soft); line-height:1.6; margin:0 0 26px; }
-  a.back { display:inline-flex; align-items:center; gap:8px; background:var(--ink); color:#fff; text-decoration:none;
-    font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; padding:11px 20px; border-radius:9px; transition:background .15s; }
-  a.back:hover { background:#3A3833; }
-  a.back svg { width:15px; height:15px; }
+  :root {
+    --be-red: #1B3A6B;
+    --be-red-dark: #10233F;
+    --ink: #15141A;
+    --ink-soft: #4A4854;
+    --paper: #FAFAF8;
+    --line: #E5E2DC;
+    --panel: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    min-height: 100vh;
+  }
+
+  @media (max-width: 900px) { .app { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    padding: 28px 26px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .brand-mark { width: 10px; height: 28px; background: var(--be-red); flex-shrink: 0; }
+
+  .brand-row h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.01em; margin: 0; line-height: 1.2; }
+
+  .brand-row span {
+    display: block; font-size: 11px; font-weight: 600; color: var(--ink-soft);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 8px; }
+
+  .field label {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--ink-soft);
+  }
+
+  textarea {
+    width: 100%; border: 1.5px solid var(--line); border-radius: 6px;
+    padding: 12px 13px; font-size: 15px; font-family: inherit; color: var(--ink);
+    background: var(--paper); resize: vertical; min-height: 84px; line-height: 1.4;
+    transition: border-color 0.15s ease;
+  }
+
+  textarea:focus { outline: none; border-color: var(--be-red); }
+
+  .char-count { font-size: 11px; color: var(--ink-soft); text-align: right; }
+  .char-count.warn { color: var(--be-red); font-weight: 700; }
+
+  .dropzone {
+    border: 2px dashed var(--line); border-radius: 8px; padding: 22px 16px;
+    text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    position: relative;
+  }
+
+  .dropzone:hover, .dropzone.dragover { border-color: var(--be-red); background: #EAF1FA; }
+  .dropzone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .dropzone-icon { font-size: 26px; margin-bottom: 6px; opacity: 0.5; }
+  .dropzone-text { font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+  .dropzone-text b { color: var(--be-red); }
+  .dropzone-sub { font-size: 11px; color: var(--ink-soft); margin-top: 3px; }
+
+  .dropzone.has-image .dropzone-icon,
+  .dropzone.has-image .dropzone-text,
+  .dropzone.has-image .dropzone-sub { display: none; }
+
+  .preview-thumb { display: none; width: 100%; border-radius: 6px; overflow: hidden; }
+  .dropzone.has-image .preview-thumb { display: block; }
+  .preview-thumb img { width: 100%; height: 90px; object-fit: cover; display: block; }
+
+  .remove-img {
+    display: none; margin-top: 8px; font-size: 12px; font-weight: 700;
+    color: var(--be-red); background: none; border: none; cursor: pointer;
+    text-decoration: underline; padding: 0;
+  }
+  .dropzone.has-image + .remove-img { display: inline-block; }
+
+  .download-btn {
+    margin-top: 6px; width: 100%; padding: 15px; background: var(--ink);
+    color: #fff; border: none; border-radius: 7px; font-size: 15px; font-weight: 800;
+    cursor: pointer; transition: background 0.15s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .download-btn:hover { background: var(--be-red-dark); }
+  .download-btn:active { transform: scale(0.98); }
+  .download-btn:disabled { background: var(--line); color: var(--ink-soft); cursor: not-allowed; }
+
+  .status-msg { font-size: 12px; color: var(--ink-soft); text-align: center; min-height: 16px; }
+  .status-msg.error { color: var(--be-red); font-weight: 600; }
+  .status-msg.success { color: #1a7a3c; font-weight: 600; }
+
+  .support-btn {
+    margin-top: 4px; width: 100%; padding: 11px; background: transparent;
+    color: var(--ink-soft); border: 1.5px dashed var(--line); border-radius: 7px;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .support-btn:hover { border-color: var(--be-red); color: var(--be-red-dark); background: #EAF1FA; }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(21,20,26,0.55);
+    align-items: center; justify-content: center; z-index: 2000; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal-box {
+    background: var(--panel); border-radius: 14px; padding: 28px 26px;
+    max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: relative;
+  }
+  .modal-close { position: absolute; top: 14px; right: 14px; background: none; border: none; font-size: 18px; color: var(--ink-soft); cursor: pointer; line-height: 1; padding: 4px; }
+  .modal-close:hover { color: var(--ink); }
+  .modal-icon { font-size: 30px; margin-bottom: 10px; }
+  .modal-box h3 { margin: 0 0 6px; font-size: 16px; font-weight: 800; }
+  .modal-box p { margin: 0 0 18px; font-size: 13px; color: var(--ink-soft); line-height: 1.4; }
+
+  .bank-card { background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px; padding: 16px; text-align: left; }
+  .bank-card .bank-name { font-size: 12px; font-weight: 700; color: var(--be-red); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .bank-card .bank-number { font-size: 19px; font-weight: 800; letter-spacing: 0.02em; margin-bottom: 4px; font-family: 'SF Mono', Consolas, monospace; }
+  .bank-card .bank-owner { font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+
+  .copy-btn { margin-top: 14px; width: 100%; padding: 11px; background: var(--ink); color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+  .copy-btn:hover { background: var(--be-red-dark); }
+  .copy-btn.copied { background: #1a7a3c; }
+
+  .preview-area {
+    background: #EFEDE7; display: flex; flex-direction: row; align-items: flex-start;
+    justify-content: center; padding: 40px; overflow: auto; gap: 20px;
+  }
+
+  .editor-toolbar { position:relative; z-index:1000; display:flex; flex-direction:column; gap:14px;
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px;
+    box-shadow:0 4px 16px rgba(0,0,0,.06); width:220px; flex-shrink:0; }
+
+  .tool-group { display:flex; flex-direction:column; gap:9px; }
+  .tool-group + .tool-group { padding-top:14px; border-top:1px solid var(--line); }
+  .tool-group-title { display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:800; color:var(--ink); }
+  .tool-group-title .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .tool-group-title .dot.mosaic { background:#3B7DD8; }
+  .tool-group-title .dot.gaussian { background:#8B5CF6; }
+  .tool-group-desc { font-size:11px; line-height:1.4; color:var(--ink-soft); }
+
+  .tool-row { display:flex; align-items:center; gap:6px; }
+  .tool-btn { width:36px; height:36px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:9px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; transition:all .15s; }
+  .tool-btn svg { width:18px; height:18px; }
+  .tool-btn:hover:not(:disabled) { background:#F2F1EC; }
+  .tool-btn.active { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .tool-btn:disabled { opacity:.35; cursor:not-allowed; }
+
+  .tool-slider-row { display:flex; flex-direction:column; gap:4px; }
+  .tool-slider-row .tool-slider-label { display:flex; justify-content:space-between; font-size:10.5px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em; }
+  .tool-slider-row input[type="range"] { width:100%; accent-color:var(--be-red); }
+
+  @media(max-width:900px){
+    .preview-area { flex-direction:column; align-items:center; }
+    .editor-toolbar { width:100%; max-width:360px; flex-direction:row; flex-wrap:wrap; }
+    .tool-group { flex:1 1 150px; }
+  }
+
+  .canvas-wrap {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+    border-radius: 4px;
+    overflow: visible !important;
+    max-width: 100%;
+    position: relative;
+  }
+
+  #canvas { display: block; width: 360px; height: 450px; background: #DDD; border-radius: 4px; }
+
+  /* Photo overlay - sits on top of canvas, represents photo bounds */
+  #photoOverlay {
+    position: absolute;
+    border: 2px dashed rgba(255,255,255,0.7);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+    cursor: grab;
+    pointer-events: all;
+    box-sizing: border-box;
+    border-radius: 2px;
+  }
+
+  #photoOverlay:active { cursor: grabbing; }
+
+  .resize-handle {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border: 2px solid #E8412C;
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    pointer-events: all;
+  }
+
+  #hNW { top: -7px; left: -7px; cursor: nw-resize; }
+  #hNE { top: -7px; right: -7px; cursor: ne-resize; }
+  #hSW { bottom: -7px; left: -7px; cursor: sw-resize; }
+  #hSE { bottom: -7px; right: -7px; cursor: se-resize; }
+
+  #resetPhotoBtn {
+    position: absolute;
+    top: -36px;
+    right: 0;
+    padding: 5px 10px;
+    background: rgba(21,20,26,0.85);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+    pointer-events: all;
+  }
+
+  #resetPhotoBtn:hover { background: #E8412C; }
+
+  @media (max-width: 900px) {
+    .preview-area { padding: 24px 16px; }
+    #canvas { width: 300px; height: 375px; }
+  }
+  .loading-screen { position:fixed; inset:0; z-index:9999; background:#FBFAF5; display:flex; align-items:center; justify-content:center; transition:opacity .5s ease, visibility .5s ease; }
+  .loading-screen.hide { opacity:0; visibility:hidden; pointer-events:none; }
+  .loading-text { font-family:'Playfair Display', Georgia, serif; font-weight:500; font-style:italic; font-size:34px; color:#3A3833; letter-spacing:.02em; opacity:0; transition:opacity .7s ease; text-align:center; padding:0 24px; }
+  .loading-text.show { opacity:1; }
+  @media(max-width:900px){.loading-text{font-size:26px}}
+  .announcement-bar { position:sticky; top:0; left:0; right:0; z-index:10000; width:100%;
+    background:var(--ink); color:#fff; padding:10px 20px; font-size:13px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+  .announcement-bar.hide { display:none; }
+  .announcement-bar .dot { width:7px; height:7px; border-radius:50%; background:#4ADE80; flex-shrink:0; }
+  .announcement-bar span.msg { line-height:1.4; text-align:center; }
+  .announcement-bar button { background:transparent; border:none; color:#fff; opacity:.6; cursor:pointer; font-size:17px; line-height:1; padding:0 0 0 6px; flex-shrink:0; margin-left:4px; }
+  .announcement-bar button:hover { opacity:1; }
+  @media(max-width:500px){ .announcement-bar{ font-size:12px; padding:9px 14px; } }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <span class="badge">Segera Hadir</span>
-    <h1>Template 2</h1>
-    <p>Template ini masih dalam proses desain. Sementara ini, pakai dulu template yang udah tersedia, ya!</p>
-    <a class="back" href="../../../index.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-      Kembali ke Dashboard
-    </a>
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-text" id="loadingText"></div>
+</div>
+
+<div class="app">
+  <div class="panel">
+    <div class="brand-row">
+      <div class="brand-mark"></div>
+      <div>
+        <h1>Generator Konten</h1>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="headline">Judul Headline</label>
+      <textarea id="headline" placeholder="Tulis judul berita di sini..." maxlength="160"></textarea>
+      <div class="char-count" id="charCount">0 / 160</div>
+    </div>
+
+    <div class="field">
+      <label>Foto Headline</label>
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp">
+        <div class="dropzone-icon">📷</div>
+        <div class="dropzone-text"><b>Klik untuk upload</b> atau drag foto</div>
+        <div class="dropzone-sub">JPG, PNG, atau WEBP</div>
+        <div class="preview-thumb" id="previewThumb"></div>
+      </div>
+      <button class="remove-img" id="removeImg">Hapus foto</button>
+    </div>
+
+    <div class="field">
+      <label for="creditInput">Kredit Foto</label>
+      <input type="text" id="creditInput" placeholder="cth: Instagram @namaakun" maxlength="60" value="-" style="width:100%; border:1.5px solid var(--line); border-radius:6px; padding:11px 13px; font-size:14px; font-family:inherit; color:var(--ink); background:var(--paper);">
+    </div>
+
+    <button class="download-btn" id="downloadBtn" disabled>⬇ Download JPG</button>
+    <div class="status-msg" id="statusMsg">Upload foto dulu buat mulai</div>
   </div>
+
+  <div class="preview-area">
+    <div class="canvas-wrap">
+      <canvas id="canvas" width="1080" height="1350"></canvas>
+      <div id="photoOverlay" style="display:none;">
+        <div class="resize-handle" id="hNW"></div>
+        <div class="resize-handle" id="hNE"></div>
+        <div class="resize-handle" id="hSW"></div>
+        <div class="resize-handle" id="hSE"></div>
+      </div>
+      <button id="resetPhotoBtn" style="display:none;">↺ Reset Foto</button>
+    </div>
+
+    <div class="editor-toolbar" id="editorToolbar">
+      <div class="tool-group">
+        <div class="tool-group-title"><span class="dot mosaic"></span>Mosaic</div>
+        <div class="tool-group-desc">Blur kotak-kotak. Cocok buat sensor wajah, plat nomor, atau detail kecil.</div>
+        <div class="tool-row">
+          <button type="button" class="tool-btn" id="mosaicToggleBtn" title="Brush mosaic" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg>
+          </button>
+          <button type="button" class="tool-btn" id="mosaicUndoBtn" title="Undo oles terakhir" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-6.7L3 9"/></svg>
+          </button>
+          <button type="button" class="tool-btn" id="mosaicClearBtn" title="Hapus semua mosaic" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+          </button>
+        </div>
+        <div class="tool-slider-row">
+          <div class="tool-slider-label"><span>Ukuran kuas</span><span id="brushSizeVal">45</span></div>
+          <input type="range" id="brushSize" min="12" max="130" value="45">
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="tool-group-title"><span class="dot gaussian"></span>Gaussian Blur</div>
+        <div class="tool-group-desc">Blur halus/lembut, tanpa efek kotak-kotak. Cocok buat background atau area luas.</div>
+        <div class="tool-row">
+          <button type="button" class="tool-btn" id="gaussianToggleBtn" title="Brush gaussian blur" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/></svg>
+          </button>
+          <button type="button" class="tool-btn" id="gaussianUndoBtn" title="Undo oles terakhir" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-6.7L3 9"/></svg>
+          </button>
+          <button type="button" class="tool-btn" id="gaussianClearBtn" title="Hapus semua gaussian blur" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+          </button>
+        </div>
+        <div class="tool-slider-row">
+          <div class="tool-slider-label"><span>Ukuran kuas</span><span id="gaussianBrushSizeVal">45</span></div>
+          <input type="range" id="gaussianBrushSize" min="12" max="130" value="45">
+        </div>
+        <div class="tool-slider-row">
+          <div class="tool-slider-label"><span>Tingkat blur</span><span id="gaussianIntensityVal">60px</span></div>
+          <input type="range" id="gaussianIntensity" min="5" max="100" value="60">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+// ===== KONFIGURASI =====
+const CANVAS_W = 1080;
+const CANVAS_H = 1350;
+const RED = '#1B3A6B'; // biru gelap brand (nama variabel dibiarkan biar konsisten sama sisa kode)
+const WHITE = '#FFFFFF'; // dipakai khusus buat teks judul, tetap putih
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const headlineInput = document.getElementById('headline');
+const charCount = document.getElementById('charCount');
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const previewThumb = document.getElementById('previewThumb');
+const removeImgBtn = document.getElementById('removeImg');
+const downloadBtn = document.getElementById('downloadBtn');
+const statusMsg = document.getElementById('statusMsg');
+
+let uploadedImg = null;
+
+// ===== KREDIT FOTO =====
+const creditInput = document.getElementById('creditInput');
+creditInput.addEventListener('input', () => render());
+
+// ===== HELPERS =====
+// Wraps text to fit maxWidth, AND respects manual line breaks (Enter key in the textarea).
+// Each paragraph (split by \n) is wrapped on its own, so a manual break always starts a new line.
+function wrapText(context, text, maxWidth) {
+  const paragraphs = text.split('\n');
+  const lines = [];
+  for (const paragraph of paragraphs) {
+    if (paragraph === '') { lines.push(''); continue; } // preserve empty lines (double Enter)
+    const words = paragraph.split(' ');
+    let current = '';
+    for (const word of words) {
+      const test = current ? current + ' ' + word : word;
+      if (context.measureText(test).width > maxWidth && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = test;
+      }
+    }
+    if (current) lines.push(current);
+  }
+  return lines;
+}
+
+function drawImageCover(context, img, x, y, w, h) {
+  const imgRatio = img.width / img.height;
+  const boxRatio = w / h;
+  let sx, sy, sw, sh;
+  if (imgRatio > boxRatio) {
+    sh = img.height;
+    sw = sh * boxRatio;
+    sx = (img.width - sw) / 2;
+    sy = 0;
+  } else {
+    sw = img.width;
+    sh = sw / boxRatio;
+    sx = 0;
+    sy = (img.height - sh) / 2;
+  }
+  context.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+}
+
+// ===== PHOTO TRANSFORM STATE =====
+let photoTransform = { x: 0, y: 0, scale: 1 };
+
+function resetPhotoTransform() {
+  photoTransform = { x: 0, y: 0, scale: 1 };
+  mosaicLayerDirty = true;
+  gaussianLayerDirty = true;
+  updatePhotoOverlay();
+  render();
+}
+
+function drawImageWithTransform(context, img, canvasW, canvasH) {
+  // Base: cover mode dimensions
+  const imgRatio = img.width / img.height;
+  const boxRatio = canvasW / canvasH;
+  let baseW, baseH;
+  if (imgRatio > boxRatio) {
+    baseH = canvasH;
+    baseW = baseH * imgRatio;
+  } else {
+    baseW = canvasW;
+    baseH = baseW / imgRatio;
+  }
+
+  // Apply scale
+  const drawW = baseW * photoTransform.scale;
+  const drawH = baseH * photoTransform.scale;
+
+  // Center by default, then apply offset
+  const drawX = (canvasW - drawW) / 2 + photoTransform.x;
+  const drawY = (canvasH - drawH) / 2 + photoTransform.y;
+
+  context.save();
+  context.beginPath();
+  context.rect(0, 0, canvasW, canvasH);
+  context.clip();
+  context.drawImage(img, drawX, drawY, drawW, drawH);
+  context.restore();
+  return { drawX, drawY, drawW, drawH };
+}
+
+// ===== MOSAIC BRUSH =====
+// maskCanvas: putih = "tampilkan mosaic di sini", transparan = "tampilkan foto asli".
+// Ukuran blok mosaic sengaja dibesarkan supaya area yang di-blur makin gak jelas.
+const mosaicToggleBtn = document.getElementById('mosaicToggleBtn');
+const mosaicUndoBtn = document.getElementById('mosaicUndoBtn');
+const mosaicClearBtn = document.getElementById('mosaicClearBtn');
+const brushSizeInput = document.getElementById('brushSize');
+
+const MOSAIC_BLOCK = 80; // makin besar = makin buram/gak jelas hasil blur-nya
+let maskCanvas = null, maskCtx = null;
+let mosaicLayerCanvas = null, mosaicLayerDirty = true;
+let compositeCanvas = null, compositeCtx = null;
+let mosaicMode = false;
+let isPainting = false, lastPaintPt = null;
+let brushRadius = parseInt(brushSizeInput.value, 10);
+let undoStack = [];
+
+function ensureMosaicCanvases() {
+  if (!maskCanvas) {
+    maskCanvas = document.createElement('canvas');
+    maskCanvas.width = CANVAS_W; maskCanvas.height = CANVAS_H;
+    maskCtx = maskCanvas.getContext('2d');
+  }
+  if (!compositeCanvas) {
+    compositeCanvas = document.createElement('canvas');
+    compositeCanvas.width = CANVAS_W; compositeCanvas.height = CANVAS_H;
+    compositeCtx = compositeCanvas.getContext('2d');
+  }
+}
+
+function clearMosaicMask() {
+  ensureMosaicCanvases();
+  maskCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  undoStack = [];
+  updateMosaicButtons();
+}
+
+// Membangun ulang versi pixelated dari foto saat ini (full canvas-space).
+// Hanya perlu dijalankan saat foto/transform berubah, bukan tiap oles kuas,
+// makanya di-cache dan ditandai dirty secara eksplisit.
+function rebuildMosaicLayer() {
+  ensureMosaicCanvases();
+  if (!mosaicLayerCanvas) {
+    mosaicLayerCanvas = document.createElement('canvas');
+    mosaicLayerCanvas.width = CANVAS_W; mosaicLayerCanvas.height = CANVAS_H;
+  }
+  const mlCtx = mosaicLayerCanvas.getContext('2d');
+  mlCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  if (!uploadedImg) { mosaicLayerDirty = false; return; }
+
+  // Gambar foto full-res ke scratch canvas dengan cara yang sama seperti di
+  // canvas utama, lalu perkecil-perbesar lewat canvas kecil untuk efek blok.
+  const srcCanvas = document.createElement('canvas');
+  srcCanvas.width = CANVAS_W; srcCanvas.height = CANVAS_H;
+  const srcCtx = srcCanvas.getContext('2d');
+  drawImageWithTransform(srcCtx, uploadedImg, CANVAS_W, CANVAS_H);
+
+  const smallW = Math.max(1, Math.round(CANVAS_W / MOSAIC_BLOCK));
+  const smallH = Math.max(1, Math.round(CANVAS_H / MOSAIC_BLOCK));
+  const tinyCanvas = document.createElement('canvas');
+  tinyCanvas.width = smallW; tinyCanvas.height = smallH;
+  const tinyCtx = tinyCanvas.getContext('2d');
+  tinyCtx.imageSmoothingEnabled = true;
+  tinyCtx.drawImage(srcCanvas, 0, 0, smallW, smallH);
+
+  mlCtx.imageSmoothingEnabled = false;
+  mlCtx.drawImage(tinyCanvas, 0, 0, smallW, smallH, 0, 0, CANVAS_W, CANVAS_H);
+  mosaicLayerDirty = false;
+}
+
+// Menggabungkan layer pixelated, yang sudah di-mask ke area yang dioles saja,
+// ke canvas utama. Dipanggil dari render(), tepat setelah foto digambar.
+function drawMosaicComposite() {
+  if (!uploadedImg || !maskCanvas) return;
+  if (mosaicLayerDirty) rebuildMosaicLayer();
+  compositeCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  compositeCtx.drawImage(mosaicLayerCanvas, 0, 0);
+  compositeCtx.globalCompositeOperation = 'destination-in';
+  compositeCtx.drawImage(maskCanvas, 0, 0);
+  compositeCtx.globalCompositeOperation = 'source-over';
+  ctx.drawImage(compositeCanvas, 0, 0);
+}
+
+function canvasPointFromEvent(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = CANVAS_W / rect.width, scaleY = CANVAS_H / rect.height;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+}
+
+function paintSegment(from, to) {
+  ensureMosaicCanvases();
+  maskCtx.lineCap = 'round'; maskCtx.lineJoin = 'round';
+  maskCtx.strokeStyle = '#fff'; maskCtx.fillStyle = '#fff';
+  maskCtx.lineWidth = brushRadius * 2;
+  maskCtx.beginPath();
+  if (from) { maskCtx.moveTo(from.x, from.y); maskCtx.lineTo(to.x, to.y); maskCtx.stroke(); }
+  maskCtx.beginPath(); maskCtx.arc(to.x, to.y, brushRadius, 0, Math.PI * 2); maskCtx.fill();
+}
+
+function updateMosaicButtons() {
+  const hasImg = !!uploadedImg;
+  mosaicToggleBtn.disabled = !hasImg;
+  mosaicUndoBtn.disabled = !hasImg || undoStack.length === 0;
+  mosaicClearBtn.disabled = !hasImg || undoStack.length === 0;
+}
+
+function startPaint(e) {
+  if (!mosaicMode || !uploadedImg) return;
+  ensureMosaicCanvases();
+  e.preventDefault();
+  undoStack.push(maskCtx.getImageData(0, 0, CANVAS_W, CANVAS_H));
+  if (undoStack.length > 25) undoStack.shift();
+  updateMosaicButtons();
+  isPainting = true;
+  const pt = canvasPointFromEvent(e);
+  paintSegment(null, pt);
+  lastPaintPt = pt;
+  render();
+}
+function movePaint(e) {
+  if (!isPainting) return;
+  e.preventDefault();
+  const pt = canvasPointFromEvent(e);
+  paintSegment(lastPaintPt, pt);
+  lastPaintPt = pt;
+  render();
+}
+function endPaint() { isPainting = false; lastPaintPt = null; }
+
+canvas.addEventListener('mousedown', startPaint);
+canvas.addEventListener('mousemove', movePaint);
+window.addEventListener('mouseup', endPaint);
+canvas.addEventListener('touchstart', startPaint, { passive: false });
+canvas.addEventListener('touchmove', movePaint, { passive: false });
+canvas.addEventListener('touchend', endPaint);
+canvas.addEventListener('touchcancel', endPaint);
+
+brushSizeInput.addEventListener('input', () => {
+  brushRadius = parseInt(brushSizeInput.value, 10);
+  brushSizeVal.textContent = brushRadius;
+  updateBrushCursor();
+});
+
+// Cursor bulat sesuai ukuran kuas, biar gak pakai crosshair default browser.
+function updateBrushCursor() {
+  if (!mosaicMode && !gaussianMode) { canvas.style.cursor = 'default'; return; }
+  const ds = getDisplayScale();
+  const radius = mosaicMode ? brushRadius : gaussianBrushRadius;
+  const color = mosaicMode ? '#E8412C' : '#8B5CF6';
+  const r = Math.max(5, Math.round(radius * ds));
+  const size = r * 2 + 4;
+  const c = size / 2;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}'><circle cx='${c}' cy='${c}' r='${r - 1}' fill='${color}2e' stroke='${color}' stroke-width='2'/></svg>`;
+  canvas.style.cursor = `url("data:image/svg+xml,${encodeURIComponent(svg)}") ${c} ${c}, crosshair`;
+}
+window.addEventListener('resize', () => { if (mosaicMode || gaussianMode) updateBrushCursor(); });
+
+mosaicToggleBtn.addEventListener('click', () => {
+  mosaicMode = !mosaicMode;
+  mosaicToggleBtn.classList.toggle('active', mosaicMode);
+  if (mosaicMode) {
+    gaussianMode = false;
+    gaussianToggleBtn.classList.remove('active');
+  }
+  photoOverlay.style.pointerEvents = (mosaicMode || gaussianMode) ? 'none' : 'all';
+  updateBrushCursor();
+});
+
+mosaicUndoBtn.addEventListener('click', () => {
+  if (undoStack.length === 0) return;
+  const snapshot = undoStack.pop();
+  ensureMosaicCanvases();
+  maskCtx.putImageData(snapshot, 0, 0);
+  updateMosaicButtons();
+  render();
+});
+
+mosaicClearBtn.addEventListener('click', () => {
+  if (!maskCtx) return;
+  ensureMosaicCanvases();
+  undoStack.push(maskCtx.getImageData(0, 0, CANVAS_W, CANVAS_H));
+  maskCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  updateMosaicButtons();
+  render();
+});
+
+// ===== GAUSSIAN BLUR BRUSH =====
+// Mekanismenya sama persis kayak mosaic (mask + layer cache + undo terpisah),
+// bedanya layer-nya digambar pakai canvas filter blur, bukan dipecah jadi blok.
+const gaussianToggleBtn = document.getElementById('gaussianToggleBtn');
+const gaussianUndoBtn = document.getElementById('gaussianUndoBtn');
+const gaussianClearBtn = document.getElementById('gaussianClearBtn');
+const gaussianBrushSizeInput = document.getElementById('gaussianBrushSize');
+const gaussianIntensityInput = document.getElementById('gaussianIntensity');
+const brushSizeVal = document.getElementById('brushSizeVal');
+const gaussianBrushSizeVal = document.getElementById('gaussianBrushSizeVal');
+const gaussianIntensityVal = document.getElementById('gaussianIntensityVal');
+
+let gaussianRadius = parseInt(gaussianIntensityInput.value, 10); // 60px default
+let gaussianMaskCanvas = null, gaussianMaskCtx = null;
+let gaussianLayerCanvas = null, gaussianLayerDirty = true;
+let gaussianCompositeCanvas = null, gaussianCompositeCtx = null;
+let gaussianMode = false;
+let gaussianIsPainting = false, gaussianLastPaintPt = null;
+let gaussianBrushRadius = parseInt(gaussianBrushSizeInput.value, 10);
+let gaussianUndoStack = [];
+
+function ensureGaussianCanvases() {
+  if (!gaussianMaskCanvas) {
+    gaussianMaskCanvas = document.createElement('canvas');
+    gaussianMaskCanvas.width = CANVAS_W; gaussianMaskCanvas.height = CANVAS_H;
+    gaussianMaskCtx = gaussianMaskCanvas.getContext('2d');
+  }
+  if (!gaussianCompositeCanvas) {
+    gaussianCompositeCanvas = document.createElement('canvas');
+    gaussianCompositeCanvas.width = CANVAS_W; gaussianCompositeCanvas.height = CANVAS_H;
+    gaussianCompositeCtx = gaussianCompositeCanvas.getContext('2d');
+  }
+}
+
+function clearGaussianMask() {
+  ensureGaussianCanvases();
+  gaussianMaskCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  gaussianUndoStack = [];
+  updateGaussianButtons();
+}
+
+// Membangun ulang versi blur halus dari foto saat ini (full canvas-space),
+// sama seperti mosaic: hanya dijalankan saat foto/transform/intensitas berubah.
+function rebuildGaussianLayer() {
+  ensureGaussianCanvases();
+  if (!gaussianLayerCanvas) {
+    gaussianLayerCanvas = document.createElement('canvas');
+    gaussianLayerCanvas.width = CANVAS_W; gaussianLayerCanvas.height = CANVAS_H;
+  }
+  const glCtx = gaussianLayerCanvas.getContext('2d');
+  glCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  if (!uploadedImg) { gaussianLayerDirty = false; return; }
+
+  glCtx.save();
+  glCtx.filter = `blur(${gaussianRadius}px)`;
+  drawImageWithTransform(glCtx, uploadedImg, CANVAS_W, CANVAS_H);
+  glCtx.restore();
+  gaussianLayerDirty = false;
+}
+
+function drawGaussianComposite() {
+  if (!uploadedImg || !gaussianMaskCanvas) return;
+  if (gaussianLayerDirty) rebuildGaussianLayer();
+  gaussianCompositeCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  gaussianCompositeCtx.drawImage(gaussianLayerCanvas, 0, 0);
+  gaussianCompositeCtx.globalCompositeOperation = 'destination-in';
+  gaussianCompositeCtx.drawImage(gaussianMaskCanvas, 0, 0);
+  gaussianCompositeCtx.globalCompositeOperation = 'source-over';
+  ctx.drawImage(gaussianCompositeCanvas, 0, 0);
+}
+
+function paintGaussianSegment(from, to) {
+  ensureGaussianCanvases();
+  gaussianMaskCtx.lineCap = 'round'; gaussianMaskCtx.lineJoin = 'round';
+  gaussianMaskCtx.strokeStyle = '#fff'; gaussianMaskCtx.fillStyle = '#fff';
+  gaussianMaskCtx.lineWidth = gaussianBrushRadius * 2;
+  gaussianMaskCtx.beginPath();
+  if (from) { gaussianMaskCtx.moveTo(from.x, from.y); gaussianMaskCtx.lineTo(to.x, to.y); gaussianMaskCtx.stroke(); }
+  gaussianMaskCtx.beginPath(); gaussianMaskCtx.arc(to.x, to.y, gaussianBrushRadius, 0, Math.PI * 2); gaussianMaskCtx.fill();
+}
+
+function updateGaussianButtons() {
+  const hasImg = !!uploadedImg;
+  gaussianToggleBtn.disabled = !hasImg;
+  gaussianUndoBtn.disabled = !hasImg || gaussianUndoStack.length === 0;
+  gaussianClearBtn.disabled = !hasImg || gaussianUndoStack.length === 0;
+}
+
+function startGaussianPaint(e) {
+  if (!gaussianMode || !uploadedImg) return;
+  ensureGaussianCanvases();
+  e.preventDefault();
+  gaussianUndoStack.push(gaussianMaskCtx.getImageData(0, 0, CANVAS_W, CANVAS_H));
+  if (gaussianUndoStack.length > 25) gaussianUndoStack.shift();
+  updateGaussianButtons();
+  gaussianIsPainting = true;
+  const pt = canvasPointFromEvent(e);
+  paintGaussianSegment(null, pt);
+  gaussianLastPaintPt = pt;
+  render();
+}
+function moveGaussianPaint(e) {
+  if (!gaussianIsPainting) return;
+  e.preventDefault();
+  const pt = canvasPointFromEvent(e);
+  paintGaussianSegment(gaussianLastPaintPt, pt);
+  gaussianLastPaintPt = pt;
+  render();
+}
+function endGaussianPaint() { gaussianIsPainting = false; gaussianLastPaintPt = null; }
+
+canvas.addEventListener('mousedown', startGaussianPaint);
+canvas.addEventListener('mousemove', moveGaussianPaint);
+window.addEventListener('mouseup', endGaussianPaint);
+canvas.addEventListener('touchstart', startGaussianPaint, { passive: false });
+canvas.addEventListener('touchmove', moveGaussianPaint, { passive: false });
+canvas.addEventListener('touchend', endGaussianPaint);
+canvas.addEventListener('touchcancel', endGaussianPaint);
+
+gaussianBrushSizeInput.addEventListener('input', () => {
+  gaussianBrushRadius = parseInt(gaussianBrushSizeInput.value, 10);
+  gaussianBrushSizeVal.textContent = gaussianBrushRadius;
+  updateBrushCursor();
+});
+
+gaussianIntensityInput.addEventListener('input', () => {
+  gaussianRadius = parseInt(gaussianIntensityInput.value, 10);
+  gaussianIntensityVal.textContent = gaussianRadius + 'px';
+  gaussianLayerDirty = true;
+  render();
+});
+
+gaussianToggleBtn.addEventListener('click', () => {
+  gaussianMode = !gaussianMode;
+  gaussianToggleBtn.classList.toggle('active', gaussianMode);
+  if (gaussianMode) {
+    mosaicMode = false;
+    mosaicToggleBtn.classList.remove('active');
+  }
+  photoOverlay.style.pointerEvents = (mosaicMode || gaussianMode) ? 'none' : 'all';
+  updateBrushCursor();
+});
+
+gaussianUndoBtn.addEventListener('click', () => {
+  if (gaussianUndoStack.length === 0) return;
+  const snapshot = gaussianUndoStack.pop();
+  ensureGaussianCanvases();
+  gaussianMaskCtx.putImageData(snapshot, 0, 0);
+  updateGaussianButtons();
+  render();
+});
+
+gaussianClearBtn.addEventListener('click', () => {
+  if (!gaussianMaskCtx) return;
+  ensureGaussianCanvases();
+  gaussianUndoStack.push(gaussianMaskCtx.getImageData(0, 0, CANVAS_W, CANVAS_H));
+  gaussianMaskCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  updateGaussianButtons();
+  render();
+});
+
+// ===== MAIN RENDER =====
+// ---- GEOMETRI FOTO BULAT ----
+// Lingkaran foto "meluber" ke atas & kanan kanvas, stroke putih di tepinya,
+// sisanya (kiri-bawah) tetap warna dasar biru navy buat tempat judul.
+const CIRCLE_CX = CANVAS_W * 0.602;
+const CIRCLE_CY = CANVAS_H * 0.193;
+const CIRCLE_R = CANVAS_W * 0.519;
+const CIRCLE_STROKE = 14;
+
+function render() {
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+
+  // ---- DASAR: warna navy solid buat seluruh kanvas ----
+  ctx.fillStyle = RED; // variabel RED berisi warna navy brand
+  ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+  // ---- FOTO DI DALAM LINGKARAN ----
+  if (uploadedImg) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(CIRCLE_CX, CIRCLE_CY, CIRCLE_R, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+    drawImageWithTransform(ctx, uploadedImg, CANVAS_W, CANVAS_H);
+    drawMosaicComposite();
+    drawGaussianComposite();
+    ctx.restore();
+  } else {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(CIRCLE_CX, CIRCLE_CY, CIRCLE_R, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+    ctx.fillStyle = '#2A2A2A';
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    ctx.fillStyle = '#888';
+    ctx.font = '500 34px Inter, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Foto akan muncul di sini', CIRCLE_CX, CIRCLE_CY);
+    ctx.textAlign = 'left';
+    ctx.restore();
+  }
+
+  // ---- STROKE PUTIH di tepi lingkaran foto ----
+  ctx.beginPath();
+  ctx.arc(CIRCLE_CX, CIRCLE_CY, CIRCLE_R, 0, Math.PI * 2);
+  ctx.lineWidth = CIRCLE_STROKE;
+  ctx.strokeStyle = WHITE;
+  ctx.stroke();
+
+  // ---- JUDUL: rata kiri, di bawah lingkaran foto ----
+  const headline = headlineInput.value.trim() || 'Judul headline berita akan tampil di sini';
+  const padX = 72;
+  const fontSize = 62;
+  const lineHeight = fontSize * 1.22;
+  const maxTextWidth = CANVAS_W - padX * 2;
+
+  ctx.font = `700 ${fontSize}px Inter, Arial, sans-serif`;
+  ctx.textAlign = 'left';
+  const lines = wrapText(ctx, headline, maxTextWidth);
+  const maxLines = 4;
+  const shownLines = lines.slice(0, maxLines);
+  if (lines.length > maxLines) {
+    let lastLine = shownLines[maxLines - 1];
+    while (ctx.measureText(lastLine + '...').width > maxTextWidth && lastLine.includes(' ')) {
+      lastLine = lastLine.slice(0, lastLine.lastIndexOf(' '));
+    }
+    shownLines[maxLines - 1] = lastLine + '...';
+  }
+
+  const circleBottomY = CIRCLE_CY + CIRCLE_R;
+  const textStartY = circleBottomY + 78;
+
+  ctx.fillStyle = WHITE;
+  shownLines.forEach((line, i) => {
+    if (line === '') return;
+    const baseline = textStartY + i * lineHeight + fontSize * 0.82;
+    ctx.fillText(line, padX, baseline);
+  });
+
+  // ---- LABEL "Cerita Bali" kanan bawah, font elegan (serif italic) ----
+  const labelY = CANVAS_H - 56;
+  ctx.textAlign = 'right';
+  ctx.font = 'italic 500 38px "Playfair Display", Georgia, serif';
+  ctx.fillStyle = WHITE;
+  ctx.fillText('Cerita Bali', CANVAS_W - padX, labelY);
+
+  // ---- KREDIT FOTO kiri bawah, tipis & italic ----
+  const creditText = creditInput.value.trim();
+  if (creditText) {
+    ctx.textAlign = 'left';
+    ctx.font = 'italic 300 24px Poppins, Arial, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.65)';
+    ctx.fillText(`Foto: ${creditText}`, padX, labelY);
+  }
+
+  ctx.textAlign = 'left';
+}
+
+// ===== EVENT HANDLERS =====
+headlineInput.addEventListener('input', () => {
+  const len = headlineInput.value.length;
+  charCount.textContent = `${len} / 160`;
+  charCount.classList.toggle('warn', len > 140);
+  render();
+});
+
+function handleFile(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    setStatus('File harus berupa gambar (JPG/PNG/WEBP)', 'error');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      uploadedImg = img;
+      photoTransform = { x: 0, y: 0, scale: 1 };
+      clearMosaicMask();
+      clearGaussianMask();
+      mosaicLayerDirty = true;
+      gaussianLayerDirty = true;
+      dropzone.classList.add('has-image');
+      previewThumb.innerHTML = '';
+      const thumb = document.createElement('img');
+      thumb.src = e.target.result;
+      previewThumb.appendChild(thumb);
+      downloadBtn.disabled = false;
+      setStatus('Foto berhasil dimuat. Siap download.', 'success');
+      render();
+      updatePhotoOverlay();
+    };
+    img.onerror = () => setStatus('Gagal memuat gambar, coba file lain', 'error');
+    img.src = e.target.result;
+  };
+  reader.onerror = () => setStatus('Gagal membaca file', 'error');
+  reader.readAsDataURL(file);
+}
+
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+});
+
+dropzone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropzone.classList.add('dragover');
+});
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropzone.classList.remove('dragover');
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+document.addEventListener('paste', (e) => {
+  const items = e.clipboardData && e.clipboardData.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      const file = item.getAsFile();
+      if (file) { handleFile(file); e.preventDefault(); }
+      break;
+    }
+  }
+});
+
+removeImgBtn.addEventListener('click', () => {
+  uploadedImg = null;
+  fileInput.value = '';
+  dropzone.classList.remove('has-image');
+  previewThumb.innerHTML = '';
+  downloadBtn.disabled = true;
+  photoTransform = { x: 0, y: 0, scale: 1 };
+  clearMosaicMask();
+  clearGaussianMask();
+  mosaicMode = false;
+  gaussianMode = false;
+  mosaicToggleBtn.classList.remove('active');
+  gaussianToggleBtn.classList.remove('active');
+  photoOverlay.style.pointerEvents = 'all';
+  canvas.style.cursor = 'default';
+  setStatus('Upload foto dulu buat mulai', '');
+  updatePhotoOverlay();
+  render();
+});
+
+// ===== PHOTO OVERLAY (drag + resize handles) =====
+const canvasWrap = document.querySelector('.canvas-wrap');
+const photoOverlay = document.getElementById('photoOverlay');
+const handleNW = document.getElementById('hNW');
+const handleNE = document.getElementById('hNE');
+const handleSW = document.getElementById('hSW');
+const handleSE = document.getElementById('hSE');
+const resetPhotoBtn = document.getElementById('resetPhotoBtn');
+
+// canvas display scale (preview vs actual 1080x1350)
+function getDisplayScale() {
+  return canvas.offsetWidth / CANVAS_W;
+}
+
+function updatePhotoOverlay() {
+  if (!uploadedImg) {
+    photoOverlay.style.display = 'none';
+    resetPhotoBtn.style.display = 'none';
+    return;
+  }
+  resetPhotoBtn.style.display = 'block';
+
+  const ds = getDisplayScale();
+
+  // Compute displayed image bounds in preview coords
+  const imgRatio = uploadedImg.width / uploadedImg.height;
+  const boxRatio = CANVAS_W / CANVAS_H;
+  let baseW, baseH;
+  if (imgRatio > boxRatio) {
+    baseH = CANVAS_H;
+    baseW = baseH * imgRatio;
+  } else {
+    baseW = CANVAS_W;
+    baseH = baseW / imgRatio;
+  }
+
+  const drawW = (baseW * photoTransform.scale) * ds;
+  const drawH = (baseH * photoTransform.scale) * ds;
+  const drawX = ((CANVAS_W - baseW * photoTransform.scale) / 2 + photoTransform.x) * ds;
+  const drawY = ((CANVAS_H - baseH * photoTransform.scale) / 2 + photoTransform.y) * ds;
+
+  photoOverlay.style.display = 'block';
+  photoOverlay.style.left = drawX + 'px';
+  photoOverlay.style.top = drawY + 'px';
+  photoOverlay.style.width = drawW + 'px';
+  photoOverlay.style.height = drawH + 'px';
+}
+
+// ---- DRAG photo to pan ----
+let isDragging = false;
+let dragStart = { x: 0, y: 0 };
+let transformAtDragStart = { x: 0, y: 0 };
+
+photoOverlay.addEventListener('mousedown', (e) => {
+  if (e.target !== photoOverlay) return; // ignore handle clicks
+  isDragging = true;
+  dragStart = { x: e.clientX, y: e.clientY };
+  transformAtDragStart = { x: photoTransform.x, y: photoTransform.y };
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isDragging && !activeHandle) return;
+
+  const ds = getDisplayScale();
+
+  if (isDragging) {
+    const dx = (e.clientX - dragStart.x) / ds;
+    const dy = (e.clientY - dragStart.y) / ds;
+    photoTransform.x = transformAtDragStart.x + dx;
+    photoTransform.y = transformAtDragStart.y + dy;
+    updatePhotoOverlay();
+    render();
+  }
+
+  if (activeHandle) {
+    handleResizeMove(e);
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  if (isDragging || activeHandle) { mosaicLayerDirty = true; gaussianLayerDirty = true; }
+  isDragging = false;
+  activeHandle = null;
+});
+
+// ---- RESIZE HANDLES ----
+let activeHandle = null;
+let resizeStart = { mouseX: 0, mouseY: 0, scale: 1, tx: 0, ty: 0 };
+
+function startResize(e, corner) {
+  activeHandle = corner;
+  resizeStart = {
+    mouseX: e.clientX,
+    mouseY: e.clientY,
+    scale: photoTransform.scale,
+    tx: photoTransform.x,
+    ty: photoTransform.y
+  };
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+function handleResizeMove(e) {
+  const ds = getDisplayScale();
+  const dx = (e.clientX - resizeStart.mouseX) / ds;
+  const dy = (e.clientY - resizeStart.mouseY) / ds;
+
+  // Compute delta based on corner being dragged
+  let delta = 0;
+  if (activeHandle === 'SE') delta = (dx + dy) / 2;
+  if (activeHandle === 'NW') delta = -(dx + dy) / 2;
+  if (activeHandle === 'NE') delta = (dx - dy) / 2;
+  if (activeHandle === 'SW') delta = (-dx + dy) / 2;
+
+  // Scale relative to current image size
+  const imgRatio = uploadedImg.width / uploadedImg.height;
+  const boxRatio = CANVAS_W / CANVAS_H;
+  let baseW;
+  if (imgRatio > boxRatio) {
+    baseW = CANVAS_H * imgRatio;
+  } else {
+    baseW = CANVAS_W;
+  }
+
+  const newScale = Math.max(0.3, Math.min(5, resizeStart.scale + delta / baseW));
+  photoTransform.scale = newScale;
+  render();
+  updatePhotoOverlay();
+}
+
+handleNW.addEventListener('mousedown', (e) => startResize(e, 'NW'));
+handleNE.addEventListener('mousedown', (e) => startResize(e, 'NE'));
+handleSW.addEventListener('mousedown', (e) => startResize(e, 'SW'));
+handleSE.addEventListener('mousedown', (e) => startResize(e, 'SE'));
+
+// Touch support
+photoOverlay.addEventListener('touchstart', (e) => {
+  if (e.target !== photoOverlay) return;
+  const t = e.touches[0];
+  isDragging = true;
+  dragStart = { x: t.clientX, y: t.clientY };
+  transformAtDragStart = { x: photoTransform.x, y: photoTransform.y };
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchmove', (e) => {
+  if (!isDragging) return;
+  const t = e.touches[0];
+  const ds = getDisplayScale();
+  photoTransform.x = transformAtDragStart.x + (t.clientX - dragStart.x) / ds;
+  photoTransform.y = transformAtDragStart.y + (t.clientY - dragStart.y) / ds;
+  updatePhotoOverlay();
+  render();
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchend', () => {
+  if (isDragging) { mosaicLayerDirty = true; gaussianLayerDirty = true; }
+  isDragging = false;
+});
+
+resetPhotoBtn.addEventListener('click', resetPhotoTransform);
+
+// update overlay on window resize
+window.addEventListener('resize', updatePhotoOverlay);
+
+downloadBtn.addEventListener('click', () => {
+  try {
+    const link = document.createElement('a');
+    link.download = `Konten-InfoBwi.jpg`;
+    link.href = canvas.toDataURL('image/jpeg', 0.92);
+    link.click();
+    setStatus('Berhasil di-download!', 'success');
+  } catch (err) {
+    setStatus('Gagal export gambar, coba lagi', 'error');
+  }
+});
+
+function setStatus(msg, type) {
+  statusMsg.textContent = msg;
+  statusMsg.className = 'status-msg' + (type ? ' ' + type : '');
+}
+
+// ===== LOADING SCREEN =====
+// Shows just ONE word per page load — not a cycling animation. Which word
+// comes up is tracked in localStorage as a "shuffle bag": every word is
+// guaranteed to appear once (in random order) before any word repeats,
+// then the bag reshuffles and the cycle starts again on a later reload.
+const LOADING_TEXTS = ['Semangat!', '화이팅!', '頑張って！', 'Forza!', 'Bon courage !', "Let's Go!"];
+const LOADING_BAG_KEY = 'be_loading_bag_v1';
+
+function shuffledCopy(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function nextLoadingTextPersisted() {
+  let bag = [];
+  try { bag = JSON.parse(localStorage.getItem(LOADING_BAG_KEY) || '[]'); } catch (e) { bag = []; }
+  if (!Array.isArray(bag) || bag.length === 0) bag = shuffledCopy(LOADING_TEXTS);
+
+  const word = bag.pop();
+  try { localStorage.setItem(LOADING_BAG_KEY, JSON.stringify(bag)); } catch (e) { /* storage unavailable, ignore */ }
+  return word;
+}
+
+const loadingScreen = document.getElementById('loadingScreen');
+const loadingTextEl = document.getElementById('loadingText');
+
+loadingTextEl.textContent = nextLoadingTextPersisted();
+requestAnimationFrame(() => loadingTextEl.classList.add('show'));
+
+const LOADING_MIN_MS = 1100; // keep the splash up at least this long so it never just flashes
+const loadingStartedAt = Date.now();
+function hideLoadingScreen() {
+  const wait = Math.max(0, LOADING_MIN_MS - (Date.now() - loadingStartedAt));
+  setTimeout(() => {
+    loadingScreen.classList.add('hide');
+  }, wait);
+}
+
+// ===== FONT LOADING =====
+function waitForFont() {
+  if (document.fonts && document.fonts.load) {
+    return Promise.all([
+      document.fonts.load('700 62px Inter'),
+      document.fonts.load('italic 300 26px Poppins'),
+      document.fonts.load('italic 500 38px "Playfair Display"')
+    ]).catch(() => {}).then(() => document.fonts.ready);
+  }
+  return Promise.resolve();
+}
+
+waitForFont().then(() => { render(); hideLoadingScreen(); });
+render();
+
+</script>
 </body>
 </html>
