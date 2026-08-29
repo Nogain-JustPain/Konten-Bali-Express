@@ -962,6 +962,44 @@ function render() {
 
   // ---- LOGO & "baliexpress.id" dihapus dari pojok atas sesuai permintaan (lihat footer baru di bawah) ----
 
+  // ---- HEADER: kredit foto (kiri atas, italic, putih+shadow) & "INFO BALI" (kanan atas, kotak putih) ----
+  const headerInset = 48;
+  const headerBaselineY = 96;
+  const creditFontSize = 26;
+  const infoBaliFontSize = 34;
+
+  // -- Kiri atas: kredit foto (putih, dikasih shadow biar menonjol dari foto)
+  const photoCreditVal = (photoCreditInput.value.trim() || 'Ist');
+  ctx.font = `italic 300 ${creditFontSize}px Poppins, Arial, sans-serif`;
+  ctx.textAlign = 'left';
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 2;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(`Foto: ${photoCreditVal}`, headerInset, headerBaselineY);
+  ctx.restore();
+
+  // -- Kanan atas: "INFO BALI" dengan background kotak putih & padding rapi
+  ctx.font = `800 ${infoBaliFontSize}px Inter, Arial, sans-serif`;
+  const infoBaliText = 'INFO BALI';
+  const infoBaliPadX = 22;
+  const infoBaliPadY = 14;
+  const infoBaliTextW = ctx.measureText(infoBaliText).width;
+  const infoBaliBoxW = infoBaliTextW + infoBaliPadX * 2;
+  const infoBaliBoxH = infoBaliFontSize + infoBaliPadY * 2;
+  const infoBaliBoxX = CANVAS_W - headerInset - infoBaliBoxW;
+  const infoBaliBoxY = headerBaselineY - infoBaliFontSize * 0.75 - infoBaliPadY;
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(infoBaliBoxX, infoBaliBoxY, infoBaliBoxW, infoBaliBoxH);
+
+  ctx.fillStyle = '#000000';
+  ctx.textAlign = 'right';
+  ctx.fillText(infoBaliText, CANVAS_W - headerInset - infoBaliPadX, infoBaliBoxY + infoBaliPadY + infoBaliFontSize * 0.75);
+  ctx.textAlign = 'left';
+
   // ---- JUDUL dengan per-baris highlight background, rata tengah, UPPERCASE ----
   const headline = (headlineInput.value.trim() || 'Judul headline berita akan tampil di sini').toUpperCase();
   const padX = 72;
@@ -1013,24 +1051,6 @@ function render() {
     ctx.fillStyle = HEADLINE_TEXT;
     ctx.fillText(line, CANVAS_W / 2, boxY + bgPadY + fontSize - 4);
   });
-  ctx.textAlign = 'left';
-
-  // ---- FOOTER: kredit foto (kiri bawah) & "Info Bali" (kanan bawah) ----
-  const domainY = startY + totalTextBlockH + domainMarginTop;
-  const sideInset = padX - bgPadX + 6; // sama besar di kiri & kanan, biar simetris
-
-  // -- Sisi kiri: kredit foto
-  const photoCreditVal = (photoCreditInput.value.trim() || 'Ist');
-  ctx.font = `italic 300 ${domainFontSize}px Poppins, Arial, sans-serif`;
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.textAlign = 'left';
-  ctx.fillText(`Foto: ${photoCreditVal}`, sideInset, domainY + domainFontSize - 4);
-
-  // -- Sisi kanan: "Info Bali" (dulunya "baliexpress.id", dipindah dari pojok atas)
-  ctx.font = `300 ${domainFontSize}px Poppins, Arial, sans-serif`;
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.textAlign = 'right';
-  ctx.fillText('Info Bali', CANVAS_W - sideInset, domainY + domainFontSize - 4);
   ctx.textAlign = 'left';
 }
 
