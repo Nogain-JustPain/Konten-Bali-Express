@@ -916,13 +916,13 @@ function render() {
   ctx.fillText(infoBaliText, CANVAS_W - headerInset - infoBaliPadX, infoBaliBoxY + infoBaliPadY + infoBaliFontSize * 0.75);
   ctx.textAlign = 'left';
 
-  // ---- JUDUL: satu shape kotak mepet kiri (maks 70% lebar kanvas), rata kiri ----
+  // ---- JUDUL: satu shape kotak mepet kiri (maks 90% lebar kanvas), rata kiri ----
   const headline = (headlineInput.value.trim() || 'Judul headline berita akan tampil di sini');
-  const fontSize = 60;
-  const maxBoxW = CANVAS_W * 0.70;
+  const fontSize = 50;
+  const maxBoxW = CANVAS_W * 0.85;
   const boxPadX = 60;
   const boxPadY = 56;
-  const lineHeight = 80;
+  const lineHeight = 68;
   const maxTextWidth = maxBoxW - boxPadX * 2;
   const bottomSpace = 100;
 
