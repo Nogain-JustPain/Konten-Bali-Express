@@ -1500,6 +1500,78 @@ const RESET_CONFIG = {
   });
 })(RESET_CONFIG);
 
+  // ======================================================================
+// SWITCH CLIENT — tempel di SETIAP template, paling bawah tag script
+// (sebelum penutupnya). Semua template harus satu project Vercel yang sama
+// dengan status.json dan maintenance.html (di root).
+// Switch-nya: edit status.json di GitHub -> { "maintenance": true } atau false.
+// ======================================================================
+const SWITCH_CONFIG = {
+  statusUrl:      '/status.json',
+  maintenanceUrl: '/maintenance.html',
+  mode:           'redirect',     // 'redirect' = pindah ke halaman maintenance | 'overlay' = ketutup di tempat
+  intervalMs:     10000,          // cek tiap 10 detik
+  downloadBtn:    '#downloadBtn', // tombol download yang diblok saat terkunci (null kalau gak ada)
+  title:          'Masih dalam tahap perbaikan',
+  message:        'Sambil nunggu, bisa ngopi and chill dulu ga sih..'
+};
+
+(function setupSwitchClient(cfg) {
+  let locked = false;
+  let overlay = null;
+
+  function showOverlay() {
+    if (overlay) return;
+    overlay = document.createElement('div');
+    overlay.style.cssText =
+      'position:fixed;inset:0;z-index:99999;background:#FAFAF8;color:#15141A;display:flex;' +
+      'flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;';
+    overlay.innerHTML =
+      '<div style="font-family:\'Playfair Display\',Georgia,serif;font-style:italic;font-weight:500;' +
+      'font-size:clamp(32px,7vw,64px);line-height:1.1;margin-bottom:14px;"></div>' +
+      '<div style="font-family:Poppins,sans-serif;font-size:clamp(15px,2.6vw,18px);color:#4A4854;"></div>';
+    overlay.children[0].textContent = cfg.title;
+    overlay.children[1].textContent = cfg.message;
+    document.body.appendChild(overlay);
+  }
+  function hideOverlay() { if (overlay) { overlay.remove(); overlay = null; } }
+
+  function lock() {
+    locked = true;
+    if (cfg.mode === 'redirect') {
+      if (location.pathname !== cfg.maintenanceUrl) {
+        // simpen alamat asal biar halaman maintenance bisa balikin user otomatis
+        const back = location.pathname + location.search + location.hash;
+        location.replace(cfg.maintenanceUrl + '?back=' + encodeURIComponent(back));
+      }
+    } else {
+      showOverlay();
+    }
+  }
+  function unlock() { locked = false; hideOverlay(); }
+
+  async function check() {
+    try {
+      const res = await fetch(cfg.statusUrl + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;                 // status.json gak kebaca -> abaikan, jangan kunci
+      const data = await res.json();
+      if (data.maintenance) lock(); else unlock();
+    } catch (e) {
+      // offline / error: JANGAN kunci
+    }
+  }
+
+  const btn = cfg.downloadBtn ? document.querySelector(cfg.downloadBtn) : null;
+  if (btn) {
+    btn.addEventListener('click', (e) => {
+      if (locked) { e.stopImmediatePropagation(); e.preventDefault(); }
+    }, true);
+  }
+
+  check();
+  setInterval(check, cfg.intervalMs);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+})(SWITCH_CONFIG);
 
 </script>
 </body>
