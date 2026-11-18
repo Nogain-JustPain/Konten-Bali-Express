@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bali Express — Masih Dalam Tahap Perbaikan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --be-red: #C0181A;
+    --ink: #15141A;
+    --ink-soft: #4A4854;
+    --paper: #FAFAF8;
+    --bar: #EFEDE7;
+    --line: #E5E2DC;
+    --panel: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+    background: var(--paper); color: var(--ink);
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* ===== NAVBAR ===== */
+  .navbar { background: var(--bar); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto; padding: 18px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 24px; color: var(--ink-soft); text-decoration: none; }
+  .nav-pill {
+    padding: 12px 26px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line);
+    font-family: inherit; font-size: 15px; font-weight: 500; color: var(--ink); text-decoration: none;
+    transition: border-color .15s, color .15s;
+  }
+  .nav-pill:hover { border-color: var(--be-red); color: var(--be-red); }
+
+  /* ===== TEKS TENGAH ===== */
+  main {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 40px 24px 80px;
+  }
+  h1 {
+    font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500;
+    font-size: clamp(36px, 7vw, 72px); line-height: 1.1; margin: 0 0 14px; letter-spacing: -.01em;
+  }
+  .sub { margin: 0; font-size: clamp(15px, 2.6vw, 18px); font-weight: 400; color: var(--ink-soft); }
+
+  @media (max-width: 600px) {
+    .brand { font-size: 21px; }
+    .nav-pill { padding: 10px 18px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="nav-inner">
+    <a class="brand" href="#">Bali Express</a>
+    <a class="nav-pill" href="#">Cek Caption</a>
+  </div>
+</header>
+
+<main>
+  <h1>Masih dalam tahap perbaikan</h1>
+  <p class="sub">Sambil nunggu, bisa ngopi and chill dulu ga sih..</p>
+</main>
+
+<script>
+// Auto-balik: cek status.json tiap 5 detik, kalau maintenance sudah false
+// user otomatis dibalikin ke halaman asalnya (tanpa refresh).
+(function () {
+  var CHECK_MS = 5000;
+  var back = new URLSearchParams(location.search).get('back') || '/';
+  // aman: cuma boleh path di domain ini, dan jangan balik ke halaman maintenance sendiri
+  if (back.charAt(0) !== '/' || back.charAt(1) === '/' || back.charAt(1) === '\\' ||
+      back.indexOf('/maintenance.html') === 0) back = '/';
+  function check() {
+    fetch('/status.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { if (d && !d.maintenance) location.replace(back); })
+      .catch(function () {});
+  }
+  setInterval(check, CHECK_MS);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
+})();
+</script>
+</body>
+</html>
