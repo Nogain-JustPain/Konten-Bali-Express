@@ -1573,6 +1573,65 @@ const SWITCH_CONFIG = {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
 })(SWITCH_CONFIG);
 
+  // ======================================================================
+// WAJIB ISI SEBELUM DOWNLOAD — tempel di paling bawah tag script
+// (sebelum penutupnya). Kalau ada field di daftar yang kosong, tombol download
+// diblok, field kosongnya ditandai merah, dan muncul pesan. Foto sendiri sudah
+// dijaga template (tombol mati sebelum ada foto).
+// Template lain: ubah ID di REQUIRED_CONFIG. Hapus baris field yang boleh kosong.
+// ======================================================================
+const REQUIRED_CONFIG = {
+  downloadBtn: '#downloadBtn',
+  statusMsg:   '#statusMsg',        // null kalau template gak punya elemen status
+  fields: [
+    { sel: '#headline',    label: 'Judul' },
+    { sel: '#photoCredit', label: 'Kredit foto' }
+  ]
+};
+
+(function setupRequiredFields(cfg) {
+  const btn = document.querySelector(cfg.downloadBtn);
+  if (!btn) return;
+  const st = cfg.statusMsg ? document.querySelector(cfg.statusMsg) : null;
+  const fields = cfg.fields
+    .map(f => ({ el: document.querySelector(f.sel), label: f.label }))
+    .filter(f => f.el);
+
+  const style = document.createElement('style');
+  style.textContent =
+    '.req-blocked{opacity:.55 !important;cursor:not-allowed !important;}' +
+    '.req-empty{outline:2px solid #C0181A !important;outline-offset:1px;}';
+  document.head.appendChild(style);
+
+  const isEmpty = (el) => el.value.trim() === '';
+  const emptyOnes = () => fields.filter(f => isEmpty(f.el));
+
+  function refresh() {
+    const empty = emptyOnes();
+    btn.classList.toggle('req-blocked', empty.length > 0);
+    btn.title = empty.length ? 'Isi dulu: ' + empty.map(f => f.label).join(', ') : '';
+    fields.forEach(f => { if (!isEmpty(f.el)) f.el.classList.remove('req-empty'); });
+  }
+
+  // Fase capture + stopImmediatePropagation = jalan duluan, download bawaan template gak kepicu
+  btn.addEventListener('click', (e) => {
+    const empty = emptyOnes();
+    if (!empty.length) return;
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    empty.forEach(f => f.el.classList.add('req-empty'));
+    empty[0].el.focus();
+    if (st) {
+      st.textContent = 'Belum bisa download, isi dulu: ' + empty.map(f => f.label).join(', ') + '.';
+      st.className = 'status-msg error';
+    }
+  }, true);
+
+  fields.forEach(f => f.el.addEventListener('input', refresh));
+  refresh();
+})(REQUIRED_CONFIG);
+
+
 </script>
 </body>
 </html>
