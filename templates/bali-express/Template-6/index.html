@@ -1340,17 +1340,16 @@ const RESET_CONFIG = {
 
   // field teks: 'selector': 'nilai default setelah reset'
   textFields: {
-    '#headline':    '',
-    '#photoCredit': 'Ist'
+    '#quoteText':  '',
+    '#personName': '',
+    '#personRole': ''
   },
 
   // checkbox yang dimatikan lagi (kosongin [] kalau gak ada)
-  checkboxes: ['#extraGradientToggle'],
+  checkboxes: [],
 
   // slider yang dibalikin ke nilai awal: 'selector': nilai
-  ranges: {
-    '#gradientIntensity': 0
-  },
+  ranges: {},
 
   message: 'Berhasil di-download! Form sudah di-reset, siap buat berita berikutnya.',
   delayMs: 150    // jeda kecil biar download kepicu dulu baru form di-reset
@@ -1480,8 +1479,9 @@ const REQUIRED_CONFIG = {
   downloadBtn: '#downloadBtn',
   statusMsg:   '#statusMsg',        // null kalau template gak punya elemen status
   fields: [
-    { sel: '#headline',    label: 'Judul' },
-    { sel: '#photoCredit', label: 'Kredit foto' }
+    { sel: '#quoteText',  label: 'Kutipan' },
+    { sel: '#personName', label: 'Nama Tokoh' },
+    { sel: '#personRole', label: 'Jabatan' }
   ]
 };
 
